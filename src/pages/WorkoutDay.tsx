@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useMotionValue, useTransform, useDragControls, animate as motionAnimate, type PanInfo } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, animate as motionAnimate } from 'framer-motion'
 import PageHeader from '../components/ui/PageHeader'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
@@ -176,19 +176,100 @@ const equipmentLabelsModal: Record<string, string> = {
 
 function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClose: () => void }) {
   const dragY = useMotionValue(0)
-  const dragControls = useDragControls()
   const sheetScale = useTransform(dragY, [0, 300], [1, 0.95])
   const sheetOpacity = useTransform(dragY, [0, 300], [1, 0.4])
+  const sheetRef = useRef<HTMLDivElement>(null)
 
-  const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 400) {
-      motionAnimate(dragY, window.innerHeight, {
-        duration: 0.25,
-        ease: 'easeIn',
-        onComplete: onClose,
-      })
-    } else {
-      motionAnimate(dragY, 0, { type: 'spring', stiffness: 400, damping: 30 })
+  useEffect(() => {
+    const el = sheetRef.current
+    if (!el) return
+
+    let startY = 0
+    let lastY = 0
+    let lastTime = 0
+    let velY = 0
+    let dragging = false
+    let mouseDown = false
+
+    const begin = (y: number) => {
+      startY = y
+      lastY = y
+      lastTime = Date.now()
+      velY = 0
+      dragging = false
+    }
+
+    const move = (y: number, prevent: () => void) => {
+      const delta = y - startY
+      const now = Date.now()
+      const dt = now - lastTime
+      if (dt > 0) velY = (y - lastY) / dt * 1000
+      lastY = y
+      lastTime = now
+
+      if (!dragging) {
+        if (delta > 8 && el.scrollTop <= 1) {
+          dragging = true
+        } else {
+          return
+        }
+      }
+
+      prevent()
+      dragY.set(Math.max(0, delta))
+    }
+
+    const finish = () => {
+      if (!dragging) return
+      dragging = false
+
+      const current = dragY.get()
+      if (current > 100 || velY > 400) {
+        motionAnimate(dragY, window.innerHeight, {
+          duration: 0.25,
+          ease: 'easeIn',
+          onComplete: onClose,
+        })
+      } else {
+        motionAnimate(dragY, 0, { type: 'spring', stiffness: 400, damping: 30 })
+      }
+    }
+
+    const onTouchStart = (e: TouchEvent) => begin(e.touches[0].clientY)
+    const onTouchMove = (e: TouchEvent) =>
+      move(e.touches[0].clientY, () => e.preventDefault())
+    const onTouchEnd = () => finish()
+
+    const onPtrMove = (e: PointerEvent) => {
+      if (!mouseDown) return
+      move(e.clientY, () => e.preventDefault())
+    }
+    const onPtrUp = () => {
+      mouseDown = false
+      finish()
+      document.removeEventListener('pointermove', onPtrMove)
+      document.removeEventListener('pointerup', onPtrUp)
+    }
+    const onPtrDown = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return
+      mouseDown = true
+      begin(e.clientY)
+      document.addEventListener('pointermove', onPtrMove)
+      document.addEventListener('pointerup', onPtrUp)
+    }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('touchend', onTouchEnd)
+    el.addEventListener('pointerdown', onPtrDown)
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('touchend', onTouchEnd)
+      el.removeEventListener('pointerdown', onPtrDown)
+      document.removeEventListener('pointermove', onPtrMove)
+      document.removeEventListener('pointerup', onPtrUp)
     }
   }, [dragY, onClose])
 
@@ -216,19 +297,11 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
       >
         <motion.div
+          ref={sheetRef}
           className="bg-surface rounded-t-2xl overflow-y-auto overscroll-contain max-h-[85dvh]"
           style={{ y: dragY, scale: sheetScale, opacity: sheetOpacity }}
-          drag="y"
-          dragControls={dragControls}
-          dragListener={false}
-          dragConstraints={{ top: 0 }}
-          dragElastic={{ top: 0.05, bottom: 0.5 }}
-          onDragEnd={handleDragEnd}
         >
-          <div
-            className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface cursor-grab active:cursor-grabbing touch-none"
-            onPointerDown={(e) => dragControls.start(e)}
-          >
+          <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface">
             <div className="w-10 h-1 rounded-full bg-text-muted/30" />
           </div>
 
