@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 
 interface ButtonProps {
   children: ReactNode
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent) => void
   variant?: 'primary' | 'secondary' | 'accent' | 'ghost' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   fullWidth?: boolean

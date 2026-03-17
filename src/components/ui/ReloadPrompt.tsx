@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ReloadPrompt() {
+  const [updating, setUpdating] = useState(false)
+
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -13,6 +16,17 @@ export default function ReloadPrompt() {
       }, 60_000)
     },
   })
+
+  const handleUpdate = async () => {
+    setUpdating(true)
+    try {
+      await updateServiceWorker(true)
+    } catch {
+      window.location.reload()
+    }
+    // If the page hasn't reloaded after 3s, force a reload
+    setTimeout(() => window.location.reload(), 3000)
+  }
 
   return (
     <AnimatePresence>
@@ -30,10 +44,11 @@ export default function ReloadPrompt() {
               <p className="text-xs text-text-secondary">Aggiorna per ottenere le ultime modifiche</p>
             </div>
             <button
-              onClick={() => updateServiceWorker(true)}
-              className="px-4 py-2 bg-accent text-bg text-sm font-bold rounded-xl shrink-0 active:scale-95 transition-transform"
+              onClick={handleUpdate}
+              disabled={updating}
+              className="px-4 py-2 bg-accent text-bg text-sm font-bold rounded-xl shrink-0 active:scale-95 transition-transform disabled:opacity-60"
             >
-              Aggiorna
+              {updating ? 'Aggiornando…' : 'Aggiorna'}
             </button>
           </div>
         </motion.div>

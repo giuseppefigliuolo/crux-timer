@@ -8,6 +8,7 @@ import trainingProgram from '../data/training-program.json'
 import type { TrainingProgram, DayType } from '../types'
 import { getCurrentDayOfWeek, getWeekNumber, formatSeconds } from '../utils/dateUtils'
 import { getTotalExerciseDuration, getDayTypeColor, getDayTypeLabel, getSessionLabel } from '../utils/programUtils'
+import { fireConfettiFromEvent } from '../utils/confetti'
 
 const program = trainingProgram as unknown as TrainingProgram
 
@@ -35,7 +36,8 @@ export default function Dashboard() {
     ? completedWorkouts.some((w) => w.date === todayDate && w.dayType === todayWorkout.type)
     : false
 
-  function handleStartProgram() {
+  function handleStartProgram(e: React.MouseEvent) {
+    fireConfettiFromEvent(e)
     setProgramStartDate(new Date().toISOString().split('T')[0])
   }
 

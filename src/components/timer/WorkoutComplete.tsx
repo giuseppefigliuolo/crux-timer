@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '../ui/Button'
 import { formatSeconds } from '../../utils/dateUtils'
+import { fireConfetti } from '../../utils/confetti'
 
 interface WorkoutCompleteProps {
   dayTitle: string
@@ -32,6 +33,11 @@ export default function WorkoutComplete({
 }: WorkoutCompleteProps) {
   const [note, setNote] = useState('')
   const [feeling, setFeeling] = useState<1 | 2 | 3 | 4 | 5>(3)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => fireConfetti(), 400)
+    return () => clearTimeout(timeout)
+  }, [])
 
   return (
     <motion.div
