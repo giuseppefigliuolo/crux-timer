@@ -78,9 +78,12 @@ export default function ActiveWorkout() {
       <header className="flex items-center justify-between px-4 h-12">
         <button
           onClick={handleExit}
-          className="text-text-secondary text-sm font-medium"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-surface-elevated/80 text-text-secondary active:scale-95 transition-transform"
+          aria-label="Chiudi"
         >
-          ✕ Esci
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M4.5 4.5l9 9M13.5 4.5l-9 9" />
+          </svg>
         </button>
         <p className="text-xs text-text-muted font-medium uppercase tracking-wider">
           Settimana {week}

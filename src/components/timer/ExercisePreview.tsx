@@ -1,9 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, animate as motionAnimate, type PanInfo } from 'framer-motion'
 import type { Exercise } from '../../types'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import ExerciseIllustration from '../illustrations/ExerciseIllustration'
+
+const DISMISS_THRESHOLD = 100
+const VELOCITY_THRESHOLD = 400
 
 interface ExercisePreviewProps {
   exercise: Exercise
@@ -18,6 +21,25 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
   const [reps, setReps] = useState(exercise.repsPerSet)
   const [time, setTime] = useState(exercise.hangTime)
   const [editing, setEditing] = useState<'sets' | 'reps' | 'time' | null>(null)
+
+  const dragY = useMotionValue(0)
+  const cardOpacity = useTransform(dragY, [0, DISMISS_THRESHOLD * 1.5], [1, 0.2])
+  const cardScale = useTransform(dragY, [0, DISMISS_THRESHOLD * 2], [1, 0.9])
+
+  const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
+    const shouldDismiss =
+      info.offset.y > DISMISS_THRESHOLD || info.velocity.y > VELOCITY_THRESHOLD
+
+    if (shouldDismiss) {
+      motionAnimate(dragY, window.innerHeight, {
+        duration: 0.3,
+        ease: 'easeIn',
+        onComplete: onSkip,
+      })
+    } else {
+      motionAnimate(dragY, 0, { type: 'spring', stiffness: 400, damping: 30 })
+    }
+  }, [dragY, onSkip])
 
   const equipmentLabels: Record<string, string> = {
     hangboard: '🪨 Hangboard',
@@ -36,12 +58,22 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
 
   return (
     <motion.div
-      className="flex flex-col items-center text-center px-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
+      <motion.div
+        className="flex flex-col items-center text-center px-6"
+        style={{ y: dragY, opacity: cardOpacity, scale: cardScale }}
+        drag="y"
+        dragDirectionLock
+        dragConstraints={{ top: 0 }}
+        dragElastic={{ top: 0.05, bottom: 0.6 }}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="w-10 h-1 rounded-full bg-text-muted/40 mb-4 shrink-0 cursor-grab active:cursor-grabbing" />
+
       <Badge variant="accent" className="mb-4">
         Esercizio {exerciseIndex + 1} di {totalExercises}
       </Badge>
@@ -118,6 +150,7 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
           Inizia
         </Button>
       </div>
+      </motion.div>
     </motion.div>
   )
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, useDragControls, animate as motionAnimate, type PanInfo } from 'framer-motion'
 import PageHeader from '../components/ui/PageHeader'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
@@ -175,6 +175,23 @@ const equipmentLabelsModal: Record<string, string> = {
 }
 
 function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClose: () => void }) {
+  const dragY = useMotionValue(0)
+  const dragControls = useDragControls()
+  const sheetScale = useTransform(dragY, [0, 300], [1, 0.95])
+  const sheetOpacity = useTransform(dragY, [0, 300], [1, 0.4])
+
+  const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 400) {
+      motionAnimate(dragY, window.innerHeight, {
+        duration: 0.25,
+        ease: 'easeIn',
+        onComplete: onClose,
+      })
+    } else {
+      motionAnimate(dragY, 0, { type: 'spring', stiffness: 400, damping: 30 })
+    }
+  }, [dragY, onClose])
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-end justify-center"
@@ -192,73 +209,87 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
       />
 
       <motion.div
-        className="relative w-full max-w-lg max-h-[85dvh] bg-surface rounded-t-2xl overflow-y-auto overscroll-contain"
+        className="relative w-full max-w-lg max-h-[85dvh] rounded-t-2xl overflow-hidden"
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
       >
-        <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface">
-          <div className="w-10 h-1 rounded-full bg-text-muted/30" />
-        </div>
+        <motion.div
+          className="bg-surface rounded-t-2xl overflow-y-auto overscroll-contain max-h-[85dvh]"
+          style={{ y: dragY, scale: sheetScale, opacity: sheetOpacity }}
+          drag="y"
+          dragControls={dragControls}
+          dragListener={false}
+          dragConstraints={{ top: 0 }}
+          dragElastic={{ top: 0.05, bottom: 0.5 }}
+          onDragEnd={handleDragEnd}
+        >
+          <div
+            className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface cursor-grab active:cursor-grabbing touch-none"
+            onPointerDown={(e) => dragControls.start(e)}
+          >
+            <div className="w-10 h-1 rounded-full bg-text-muted/30" />
+          </div>
 
-        <div className="px-5 pb-8">
-          <div className="flex flex-col items-center text-center mb-5">
-            <div className="w-28 h-28 rounded-2xl bg-surface-elevated flex items-center justify-center mb-4">
-              <ExerciseIllustration name={exercise.illustration} size={96} />
+          <div className="px-5 pb-8">
+            <div className="flex flex-col items-center text-center mb-5">
+              <div className="w-28 h-28 rounded-2xl bg-surface-elevated flex items-center justify-center mb-4">
+                <ExerciseIllustration name={exercise.illustration} size={96} />
+              </div>
+              <h2 className="text-lg font-bold text-text">{exercise.name}</h2>
             </div>
-            <h2 className="text-lg font-bold text-text">{exercise.name}</h2>
-          </div>
 
-          <p className="text-sm text-text-secondary leading-relaxed mb-5">
-            {exercise.description}
-          </p>
+            <p className="text-sm text-text-secondary leading-relaxed mb-5">
+              {exercise.description}
+            </p>
 
-          <div className="flex flex-wrap gap-2 mb-5">
-            <span className="text-xs px-3 py-1 rounded-full bg-surface-elevated text-text-muted font-medium">
-              {equipmentLabelsModal[exercise.equipment] ?? exercise.equipment}
-            </span>
-            {exercise.grip && (
-              <span className="text-xs px-3 py-1 rounded-full bg-primary-soft text-primary font-medium">
-                ✋ {gripLabels[exercise.grip] ?? exercise.grip}
+            <div className="flex flex-wrap gap-2 mb-5">
+              <span className="text-xs px-3 py-1 rounded-full bg-surface-elevated text-text-muted font-medium">
+                {equipmentLabelsModal[exercise.equipment] ?? exercise.equipment}
               </span>
-            )}
-            {exercise.weight && exercise.weight !== 'corpo libero' && (
-              <span className="text-xs px-3 py-1 rounded-full bg-violet-soft text-violet font-medium">
-                ⚖️ {exercise.weight}
-              </span>
-            )}
-          </div>
+              {exercise.grip && (
+                <span className="text-xs px-3 py-1 rounded-full bg-primary-soft text-primary font-medium">
+                  ✋ {gripLabels[exercise.grip] ?? exercise.grip}
+                </span>
+              )}
+              {exercise.weight && exercise.weight !== 'corpo libero' && (
+                <span className="text-xs px-3 py-1 rounded-full bg-violet-soft text-violet font-medium">
+                  ⚖️ {exercise.weight}
+                </span>
+              )}
+            </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <DetailCell label="Serie" value={String(exercise.sets)} color="text-primary" />
-            <DetailCell label="Ripetizioni" value={String(exercise.repsPerSet)} color="text-secondary" />
-            <DetailCell label="Tempo" value={`${exercise.hangTime}s`} color="text-accent" />
-            <DetailCell
-              label="Recupero set"
-              value={`${exercise.restBetweenSets}s`}
-              color="text-text-muted"
-            />
-            {exercise.restBetweenReps > 0 && (
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <DetailCell label="Serie" value={String(exercise.sets)} color="text-primary" />
+              <DetailCell label="Ripetizioni" value={String(exercise.repsPerSet)} color="text-secondary" />
+              <DetailCell label="Tempo" value={`${exercise.hangTime}s`} color="text-accent" />
               <DetailCell
-                label="Recupero rep"
-                value={`${exercise.restBetweenReps}s`}
+                label="Recupero set"
+                value={`${exercise.restBetweenSets}s`}
                 color="text-text-muted"
               />
-            )}
-          </div>
-
-          {exercise.notes && (
-            <div className="rounded-xl bg-accent-soft/30 border border-accent/10 px-4 py-3 mb-5">
-              <p className="text-xs text-accent font-semibold uppercase tracking-wider mb-1">Note</p>
-              <p className="text-sm text-text-secondary">{exercise.notes}</p>
+              {exercise.restBetweenReps > 0 && (
+                <DetailCell
+                  label="Recupero rep"
+                  value={`${exercise.restBetweenReps}s`}
+                  color="text-text-muted"
+                />
+              )}
             </div>
-          )}
 
-          <Button variant="ghost" size="md" fullWidth onClick={onClose}>
-            Chiudi
-          </Button>
-        </div>
+            {exercise.notes && (
+              <div className="rounded-xl bg-accent-soft/30 border border-accent/10 px-4 py-3 mb-5">
+                <p className="text-xs text-accent font-semibold uppercase tracking-wider mb-1">Note</p>
+                <p className="text-sm text-text-secondary">{exercise.notes}</p>
+              </div>
+            )}
+
+            <Button variant="ghost" size="md" fullWidth onClick={onClose}>
+              Chiudi
+            </Button>
+          </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   )
