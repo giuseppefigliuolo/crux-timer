@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import PageHeader from '../components/ui/PageHeader'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
+import ExerciseIllustration from '../components/illustrations/ExerciseIllustration'
 import trainingProgram from '../data/training-program.json'
 import type { TrainingProgram, Exercise } from '../types'
 import { getDayNameIT, formatSeconds } from '../utils/dateUtils'
@@ -23,6 +25,7 @@ const fadeUp = {
 export default function WorkoutDay() {
   const { weekNumber, dayOfWeek } = useParams<{ weekNumber: string; dayOfWeek: string }>()
   const navigate = useNavigate()
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
 
   const week = Number(weekNumber)
   const day = getWorkoutForDay(program, week, dayOfWeek ?? '')
@@ -74,7 +77,7 @@ export default function WorkoutDay() {
         <div className="space-y-3 mb-8">
           {day.exercises.map((exercise, index) => (
             <motion.div key={exercise.id} variants={fadeUp}>
-              <ExerciseCard exercise={exercise} index={index} />
+              <ExerciseCard exercise={exercise} index={index} onTap={() => setSelectedExercise(exercise)} />
             </motion.div>
           ))}
         </div>
@@ -90,11 +93,17 @@ export default function WorkoutDay() {
           </Button>
         </motion.div>
       </motion.div>
+
+      <AnimatePresence>
+        {selectedExercise && (
+          <ExerciseDetailModal exercise={selectedExercise} onClose={() => setSelectedExercise(null)} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
-function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }) {
+function ExerciseCard({ exercise, index, onTap }: { exercise: Exercise; index: number; onTap: () => void }) {
   const equipmentLabels: Record<string, string> = {
     hangboard: 'Hangboard',
     wooden_balls: 'Sfere legno',
@@ -106,7 +115,7 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
   }
 
   return (
-    <Card>
+    <Card onClick={onTap}>
       <div className="flex items-start gap-3">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-elevated text-text-muted text-sm font-bold font-timer shrink-0">
           {index + 1}
@@ -141,5 +150,124 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
         </div>
       </div>
     </Card>
+  )
+}
+
+const gripLabels: Record<string, string> = {
+  half_crimp: 'Semi-arcuata',
+  open_hand: 'Mano aperta',
+  full_crimp: 'Arcuata piena',
+  three_finger_drag: 'Tre dita',
+  pinch: 'Pinch',
+  sloper: 'Sloper',
+  mixed: 'Mista',
+}
+
+const equipmentLabelsModal: Record<string, string> = {
+  hangboard: '🪨 Hangboard',
+  wooden_balls: '⚪ Sfere legno',
+  pull_up_bar: '🏋️ Sbarra',
+  dumbbells: '💪 Manubri',
+  fitness_band: '🔵 Elastico',
+  yoga_mat: '🧘 Tappetino',
+  bodyweight: '🤸 Corpo libero',
+}
+
+function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClose: () => void }) {
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      <motion.div
+        className="relative w-full max-w-lg max-h-[85dvh] bg-surface rounded-t-2xl overflow-y-auto overscroll-contain"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+      >
+        <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface">
+          <div className="w-10 h-1 rounded-full bg-text-muted/30" />
+        </div>
+
+        <div className="px-5 pb-8">
+          <div className="flex flex-col items-center text-center mb-5">
+            <div className="w-28 h-28 rounded-2xl bg-surface-elevated flex items-center justify-center mb-4">
+              <ExerciseIllustration name={exercise.illustration} size={96} />
+            </div>
+            <h2 className="text-lg font-bold text-text">{exercise.name}</h2>
+          </div>
+
+          <p className="text-sm text-text-secondary leading-relaxed mb-5">
+            {exercise.description}
+          </p>
+
+          <div className="flex flex-wrap gap-2 mb-5">
+            <span className="text-xs px-3 py-1 rounded-full bg-surface-elevated text-text-muted font-medium">
+              {equipmentLabelsModal[exercise.equipment] ?? exercise.equipment}
+            </span>
+            {exercise.grip && (
+              <span className="text-xs px-3 py-1 rounded-full bg-primary-soft text-primary font-medium">
+                ✋ {gripLabels[exercise.grip] ?? exercise.grip}
+              </span>
+            )}
+            {exercise.weight && exercise.weight !== 'corpo libero' && (
+              <span className="text-xs px-3 py-1 rounded-full bg-violet-soft text-violet font-medium">
+                ⚖️ {exercise.weight}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <DetailCell label="Serie" value={String(exercise.sets)} color="text-primary" />
+            <DetailCell label="Ripetizioni" value={String(exercise.repsPerSet)} color="text-secondary" />
+            <DetailCell label="Tempo" value={`${exercise.hangTime}s`} color="text-accent" />
+            <DetailCell
+              label="Recupero set"
+              value={`${exercise.restBetweenSets}s`}
+              color="text-text-muted"
+            />
+            {exercise.restBetweenReps > 0 && (
+              <DetailCell
+                label="Recupero rep"
+                value={`${exercise.restBetweenReps}s`}
+                color="text-text-muted"
+              />
+            )}
+          </div>
+
+          {exercise.notes && (
+            <div className="rounded-xl bg-accent-soft/30 border border-accent/10 px-4 py-3 mb-5">
+              <p className="text-xs text-accent font-semibold uppercase tracking-wider mb-1">Note</p>
+              <p className="text-sm text-text-secondary">{exercise.notes}</p>
+            </div>
+          )}
+
+          <Button variant="ghost" size="md" fullWidth onClick={onClose}>
+            Chiudi
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function DetailCell({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="bg-surface-elevated rounded-xl p-3 text-center">
+      <p className={`text-lg font-bold font-timer ${color}`}>{value}</p>
+      <p className="text-[10px] uppercase tracking-wider text-text-muted">{label}</p>
+    </div>
   )
 }
