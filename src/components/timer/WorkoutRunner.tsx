@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Exercise, WorkoutPhase } from '../../types'
 import CircularTimer from './CircularTimer'
@@ -45,9 +45,11 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
 
   const baseExercise = exercises[exerciseIndex]
   const exerciseOverride = overrides[exerciseIndex]
-  const exercise = baseExercise && exerciseOverride
-    ? { ...baseExercise, ...exerciseOverride }
-    : baseExercise
+  const exercise = useMemo(() => {
+    return baseExercise && exerciseOverride
+      ? { ...baseExercise, ...exerciseOverride }
+      : baseExercise
+  }, [baseExercise, exerciseOverride])
 
   const handleTimerComplete = useCallback(() => {
     if (!exercise) return
