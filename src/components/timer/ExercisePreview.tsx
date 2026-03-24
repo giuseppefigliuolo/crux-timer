@@ -96,7 +96,7 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 w-full max-w-xs mb-2">
+      <div className={`grid ${exercise.type === 'reps' ? 'grid-cols-2' : 'grid-cols-3'} gap-3 w-full max-w-xs mb-2`}>
         <ParamBox
           value={sets}
           label="Serie"
@@ -113,15 +113,17 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
           active={editing === 'reps'}
           onClick={() => setEditing(editing === 'reps' ? null : 'reps')}
         />
-        <ParamBox
-          value={time}
-          suffix="s"
-          label="Tempo"
-          color="text-accent"
-          ringColor="ring-accent/40"
-          active={editing === 'time'}
-          onClick={() => setEditing(editing === 'time' ? null : 'time')}
-        />
+        {exercise.type !== 'reps' && (
+          <ParamBox
+            value={time}
+            suffix="s"
+            label="Tempo"
+            color="text-accent"
+            ringColor="ring-accent/40"
+            active={editing === 'time'}
+            onClick={() => setEditing(editing === 'time' ? null : 'time')}
+          />
+        )}
       </div>
 
       <AnimatePresence mode="wait">
