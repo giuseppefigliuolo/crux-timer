@@ -34,6 +34,7 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
   const [completedExercises, setCompletedExercises] = useState(0)
   const [wasPausedPhase, setWasPausedPhase] = useState<WorkoutPhase>('hanging')
   const [overrides, setOverrides] = useState<Record<number, { sets: number; repsPerSet: number; hangTime: number }>>({})
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false)
 
   const startTimeRef = useRef(Date.now())
   const lastCountdownRef = useRef(0)
@@ -197,6 +198,11 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
   }, [exercise, currentSet, exerciseIndex, exercises.length,
       beepComplete, speak, vibrateMedium, vibrateLong, wakeLockRelease])
 
+  const handleSkipTimer = useCallback(() => {
+    timer.stop()
+    handleTimerComplete()
+  }, [timer, handleTimerComplete])
+
   const handlePause = useCallback(() => {
     timer.pause()
     setWasPausedPhase(phase)
@@ -207,6 +213,11 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
     setPhase(wasPausedPhase)
     timer.resume()
   }, [timer, wasPausedPhase])
+
+  const handleSkipExerciseConfirm = useCallback(() => {
+    setShowSkipConfirm(false)
+    handleSkipExercise()
+  }, [handleSkipExercise])
 
   const handleSave = useCallback(
     (note: string, feeling: 1 | 2 | 3 | 4 | 5) => {
@@ -305,15 +316,56 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             <p className="text-xs text-text-muted uppercase tracking-wider">Fatto</p>
 
             <button
-              onClick={handleSkipExercise}
+              onClick={() => setShowSkipConfirm(true)}
               className="mt-6 w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              title="Salta esercizio"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="5 4 15 12 5 20" />
-                <line x1="19" y1="5" x2="19" y2="19" />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </motion.div>
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showSkipConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6"
+              onClick={() => setShowSkipConfirm(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="text-text font-semibold mb-1">Saltare esercizio?</p>
+                <p className="text-sm text-text-muted mb-5">
+                  L&apos;esercizio verrà segnato come saltato.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowSkipConfirm(false)}
+                    className="flex-1 h-11 rounded-xl bg-surface border border-border text-sm font-medium text-text"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    onClick={handleSkipExerciseConfirm}
+                    className="flex-1 h-11 rounded-xl bg-danger/15 text-sm font-medium text-danger"
+                  >
+                    Salta
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     )
@@ -366,16 +418,68 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             )}
 
             <button
-              onClick={handleSkipExercise}
+              onClick={handleSkipTimer}
               className="w-12 h-12 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              title="Salta timer"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="5 4 15 12 5 20" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5F5F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 4 15 12 5 20" fill="#F5F5F7" />
                 <line x1="19" y1="5" x2="19" y2="19" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setShowSkipConfirm(true)}
+              className="w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              title="Salta esercizio"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
         </motion.div>
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSkipConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6"
+            onClick={() => setShowSkipConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-text font-semibold mb-1">Saltare esercizio?</p>
+              <p className="text-sm text-text-muted mb-5">
+                L&apos;esercizio verrà segnato come saltato.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSkipConfirm(false)}
+                  className="flex-1 h-11 rounded-xl bg-surface border border-border text-sm font-medium text-text"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleSkipExerciseConfirm}
+                  className="flex-1 h-11 rounded-xl bg-danger/15 text-sm font-medium text-danger"
+                >
+                  Salta
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   )
