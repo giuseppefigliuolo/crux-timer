@@ -49,7 +49,7 @@ export default function Dashboard() {
       animate="show"
     >
       <motion.div variants={fadeUp} className="mb-6">
-        <h1 className="text-3xl font-black tracking-tight">
+        <h1 className="text-4xl tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           <span className="text-gradient-primary">Crux</span>
           <span className="text-text">Timer</span>
         </h1>
@@ -106,7 +106,7 @@ export default function Dashboard() {
               </div>
               {isTodayCompleted && (
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success/20">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4DD474" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5CB87A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
@@ -121,7 +121,7 @@ export default function Dashboard() {
           </h2>
           <Card>
             <div className="text-center py-4">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6E6E85" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-1">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-1">
                 <circle cx="12" cy="5" r="2" />
                 <path d="M7 21l3-9 2 3 2-3 3 9" />
                 <path d="M9 12l-2-4h10l-2 4" />
@@ -163,7 +163,7 @@ export default function Dashboard() {
                       <p className="text-xs text-text-secondary">{day.title}</p>
                     </div>
                   </div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55556A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </div>
@@ -202,7 +202,7 @@ function DayDot({ type, completed }: { type: DayType; completed: boolean }) {
   if (completed) {
     return (
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success/20">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4DD474" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5CB87A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>

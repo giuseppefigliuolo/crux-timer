@@ -14,7 +14,12 @@ export default function PageHeader({ title, subtitle, backButton, rightAction }:
 
   return (
     <motion.header
-      className="sticky top-0 z-40 glass border-b border-border"
+      className="sticky top-0 z-40 border-b-[3px] border-[#3A1248]"
+      style={{
+        backgroundColor: 'color-mix(in srgb, #F4E8C4 92%, transparent)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -22,17 +27,28 @@ export default function PageHeader({ title, subtitle, backButton, rightAction }:
       <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
         <div className="flex items-center gap-3">
           {backButton && (
-            <button
+            <motion.button
               onClick={() => navigate(-1)}
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-elevated text-text-secondary"
+              className="flex items-center justify-center w-9 h-9 border-[2.5px] border-[#3A1248] cursor-pointer"
+              style={{
+                backgroundColor: '#EDE0B2',
+                borderRadius: '1rem 0.75rem 1rem 0.75rem / 0.75rem 1rem 0.75rem 1rem',
+                boxShadow: '2px 2px 0px #3A1248, inset 0 1px 0 rgba(255,255,255,0.5)',
+              }}
+              whileTap={{ x: 2, y: 2, boxShadow: '0px 0px 0px #3A1248' }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3A1248" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
-            </button>
+            </motion.button>
           )}
           <div>
-            <h1 className="text-base font-bold text-text">{title}</h1>
+            <h1
+              className="text-base text-text"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {title}
+            </h1>
             {subtitle && <p className="text-xs text-text-secondary">{subtitle}</p>}
           </div>
         </div>

@@ -28,7 +28,7 @@ export default function ProgressPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <h1 className="text-2xl font-bold mb-1">Progressi</h1>
+      <h1 className="text-3xl mb-1" style={{ fontFamily: 'var(--font-display)' }}>Progressi</h1>
       <p className="text-text-secondary text-sm mb-6">Il tuo percorso di allenamento</p>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
@@ -78,7 +78,7 @@ export default function ProgressPage() {
 
       {sortedWorkouts.length === 0 && (
         <div className="text-center py-12">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6E6E85" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2">
             <circle cx="12" cy="5" r="2" />
             <path d="M7 21l3-9 2 3 2-3 3 9" />
             <path d="M9 12l-2-4h10l-2 4" />

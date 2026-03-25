@@ -356,7 +356,7 @@ export default function WorkoutRunner({
                   key={i}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     i < currentSet
-                      ? 'w-8 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
+                      ? 'w-8 bg-primary shadow-[0_0_8px_rgba(232,98,42,0.4)]'
                       : i === currentSet - 1
                         ? 'w-8 bg-primary'
                         : 'w-5 bg-surface-elevated'
@@ -375,7 +375,7 @@ export default function WorkoutRunner({
                 style={{
                   width: 160,
                   height: 160,
-                  backgroundColor: '#E8175D40'
+                  backgroundColor: '#E8622A30'
                 }}
               />
               <div className="w-52 h-52 rounded-full border-[6px] border-primary/20 flex flex-col items-center justify-center">
@@ -408,7 +408,7 @@ export default function WorkoutRunner({
                 height="32"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#F5F5F7"
+                stroke="#FFFBF0"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -427,7 +427,7 @@ export default function WorkoutRunner({
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8E8EA0"
+                stroke="#9C7B5C"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -508,7 +508,7 @@ export default function WorkoutRunner({
                     key={i}
                     className={`h-2 rounded-full transition-all duration-300 ${
                       isDone
-                        ? 'w-6 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
+                        ? 'w-6 bg-primary shadow-[0_0_8px_rgba(232,98,42,0.4)]'
                         : isCurrent
                           ? 'w-6 bg-primary/50'
                           : 'w-4 bg-surface-elevated'
@@ -536,7 +536,8 @@ export default function WorkoutRunner({
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowSkipConfirm(true)}
-              className="w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-surface border-2 border-[#1A0800] flex items-center justify-center"
+              style={{ boxShadow: '2px 2px 0px #1A0800' }}
               title="Salta esercizio"
             >
               <svg
@@ -544,7 +545,7 @@ export default function WorkoutRunner({
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8E8EA0"
+                stroke="#9C7B5C"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -559,16 +560,17 @@ export default function WorkoutRunner({
                 onClick={handleResume}
                 className="w-16 h-16 rounded-full bg-accent flex items-center justify-center"
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#0A0A12">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#1A0800">
                   <polygon points="5 3 19 12 5 21" />
                 </svg>
               </button>
             ) : (
               <button
                 onClick={handlePause}
-                className="w-16 h-16 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+                className="w-16 h-16 rounded-full bg-surface border-2 border-[#1A0800] flex items-center justify-center"
+              style={{ boxShadow: '2px 2px 0px #1A0800' }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="#F5F5F7">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1A0800">
                   <rect x="6" y="4" width="4" height="16" rx="1" />
                   <rect x="14" y="4" width="4" height="16" rx="1" />
                 </svg>
@@ -577,7 +579,8 @@ export default function WorkoutRunner({
 
             <button
               onClick={handleSkipTimer}
-              className="w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-surface border-2 border-[#1A0800] flex items-center justify-center"
+              style={{ boxShadow: '2px 2px 0px #1A0800' }}
               title="Salta timer"
             >
               <svg
@@ -585,7 +588,7 @@ export default function WorkoutRunner({
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#8E8EA0"
+                stroke="#9C7B5C"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"

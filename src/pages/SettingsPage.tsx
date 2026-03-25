@@ -45,7 +45,7 @@ export default function SettingsPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <h1 className="text-2xl font-bold mb-1">Impostazioni</h1>
+      <h1 className="text-3xl mb-1" style={{ fontFamily: 'var(--font-display)' }}>Impostazioni</h1>
       <p className="text-text-secondary text-sm mb-6">Personalizza la tua esperienza</p>
 
       <div className="space-y-6">
@@ -81,7 +81,7 @@ export default function SettingsPage() {
           </h2>
           <Card>
             <div className="flex items-center gap-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
               </svg>
               <input
@@ -94,7 +94,7 @@ export default function SettingsPage() {
                 aria-label="Volume"
                 className="flex-1 accent-primary h-1"
               />
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                 <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" />
               </svg>
