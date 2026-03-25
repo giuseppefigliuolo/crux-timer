@@ -57,7 +57,7 @@ export default function CalendarPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <h1 className="text-2xl font-bold mb-1">Calendario</h1>
+      <h1 className="text-3xl mb-1" style={{ fontFamily: 'var(--font-display)' }}>Calendario</h1>
       <p className="text-text-secondary text-sm mb-6">
         {getMonthNameIT(month)} {year}
       </p>

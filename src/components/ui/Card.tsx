@@ -8,24 +8,38 @@ interface CardProps {
   variant?: 'default' | 'primary' | 'secondary' | 'violet'
 }
 
-const borderColors = {
-  default: 'border-border',
-  primary: 'border-primary/20',
-  secondary: 'border-secondary/20',
-  violet: 'border-violet/20',
+// Each variant has a warm tinted background that reads clearly on parchment
+const variantStyles: Record<string, { bg: string; shadow: string }> = {
+  default:   { bg: '#FFF8E8', shadow: '5px 5px 0px #3A1248' },
+  primary:   { bg: '#FDEEE4', shadow: '5px 5px 0px #3A1248' },
+  secondary: { bg: '#E2F6F6', shadow: '5px 5px 0px #3A1248' },
+  violet:    { bg: '#F2EAF8', shadow: '5px 5px 0px #3A1248' },
 }
+
+// Each corner has a slightly different radius — organic wavy feel
+const CARD_RADIUS = '1.75rem 1.25rem 1.75rem 1.25rem / 1.25rem 1.75rem 1.25rem 1.75rem'
 
 export default function Card({ children, className = '', onClick, variant = 'default' }: CardProps) {
   const Component = onClick ? motion.button : motion.div
+  const style = variantStyles[variant] ?? variantStyles.default
 
   return (
     <Component
       onClick={onClick}
-      className={`bg-surface rounded-xl border ${borderColors[variant]} p-4 text-left w-full ${
-        onClick ? 'active:scale-[0.98] cursor-pointer' : ''
-      } ${className}`}
-      whileTap={onClick ? { scale: 0.98 } : undefined}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      className={`border-[3px] border-[#3A1248] p-4 text-left w-full
+        ${onClick ? 'cursor-pointer' : ''}
+        ${className}`}
+      style={{
+        backgroundColor: style.bg,
+        borderRadius: CARD_RADIUS,
+        boxShadow: `${style.shadow}, inset 0 2px 0 rgba(255,255,255,0.55)`,
+      }}
+      whileTap={onClick ? {
+        x: 5,
+        y: 5,
+        boxShadow: `0px 0px 0px #3A1248, inset 0 1px 0 rgba(255,255,255,0.3)`,
+      } : undefined}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
       {children}
     </Component>

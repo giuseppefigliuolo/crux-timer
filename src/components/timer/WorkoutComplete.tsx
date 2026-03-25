@@ -52,12 +52,12 @@ export default function WorkoutComplete({
         transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mb-4"
       >
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4DD474" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5CB87A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </motion.div>
 
-      <h2 className="text-2xl font-bold text-text mb-1">Allenamento Completato!</h2>
+      <h2 className="text-2xl text-text mb-1" style={{ fontFamily: 'var(--font-display)' }}>Allenamento Completato!</h2>
       <p className="text-text-secondary text-sm mb-6">{dayTitle}</p>
 
       <div className="grid grid-cols-3 gap-3 w-full max-w-xs mb-6">
