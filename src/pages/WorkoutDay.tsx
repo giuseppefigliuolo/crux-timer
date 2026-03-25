@@ -194,14 +194,14 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
     const begin = (y: number) => {
       startY = y
       lastY = y
-      lastTime = Date.now()
+      lastTime = performance.now()
       velY = 0
       dragging = false
     }
 
     const move = (y: number, prevent: () => void) => {
       const delta = y - startY
-      const now = Date.now()
+      const now = performance.now()
       const dt = now - lastTime
       if (dt > 0) velY = (y - lastY) / dt * 1000
       lastY = y

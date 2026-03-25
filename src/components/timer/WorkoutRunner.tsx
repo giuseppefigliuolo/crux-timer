@@ -25,7 +25,12 @@ interface WorkoutRunnerProps {
   onExit: () => void
 }
 
-export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit }: WorkoutRunnerProps) {
+export default function WorkoutRunner({
+  exercises,
+  dayTitle,
+  onComplete,
+  onExit
+}: WorkoutRunnerProps) {
   const [phase, setPhase] = useState<WorkoutPhase>('preview')
   const [exerciseIndex, setExerciseIndex] = useState(0)
   const [currentSet, setCurrentSet] = useState(1)
@@ -33,11 +38,18 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
   const [skippedExercises, setSkippedExercises] = useState<string[]>([])
   const [completedExercises, setCompletedExercises] = useState(0)
   const [wasPausedPhase, setWasPausedPhase] = useState<WorkoutPhase>('hanging')
-  const [overrides, setOverrides] = useState<Record<number, { sets: number; repsPerSet: number; hangTime: number }>>({})
+  const [overrides, setOverrides] = useState<
+    Record<number, { sets: number; repsPerSet: number; hangTime: number }>
+  >({})
   const [showSkipConfirm, setShowSkipConfirm] = useState(false)
 
-  const startTimeRef = useRef(Date.now())
+  const startTimeRef = useRef(0)
+  const [finalDuration, setFinalDuration] = useState(0)
   const lastCountdownRef = useRef(0)
+
+  useEffect(() => {
+    startTimeRef.current = performance.now()
+  }, [])
 
   const { beepStart, beepEnd, beepCountdown, beepComplete } = useAudio()
   const { speak } = useSpeech()
@@ -76,6 +88,9 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             setPhase('preview')
           }, 2000)
         } else {
+          setFinalDuration(
+            Math.floor((performance.now() - startTimeRef.current) / 1000)
+          )
           setPhase('workout_complete')
           beepComplete()
           vibrateLong()
@@ -109,8 +124,22 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
       beepStart()
       vibrateShort()
     }
-  }, [phase, exercise, currentRep, currentSet, exerciseIndex, exercises.length,
-    beepStart, beepEnd, beepComplete, speak, vibrateShort, vibrateMedium, vibrateLong, wakeLockRelease])
+  }, [
+    phase,
+    exercise,
+    currentRep,
+    currentSet,
+    exerciseIndex,
+    exercises.length,
+    beepStart,
+    beepEnd,
+    beepComplete,
+    speak,
+    vibrateShort,
+    vibrateMedium,
+    vibrateLong,
+    wakeLockRelease
+  ])
 
   const timer = useTimer(handleTimerComplete)
 
@@ -134,22 +163,30 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
   }, [phase, exercise, exerciseIndex, currentSet, currentRep, isRepsExercise]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (phase !== 'hanging' && phase !== 'resting' && phase !== 'set_rest') return
+    if (phase !== 'hanging' && phase !== 'resting' && phase !== 'set_rest')
+      return
     const remaining = Math.ceil(timer.timeRemaining)
-    if (remaining <= 3 && remaining > 0 && remaining !== lastCountdownRef.current) {
+    if (
+      remaining <= 3 &&
+      remaining > 0 &&
+      remaining !== lastCountdownRef.current
+    ) {
       lastCountdownRef.current = remaining
       beepCountdown()
     }
   }, [timer.timeRemaining, phase, beepCountdown])
 
-  const handleStartExercise = useCallback((params: { sets: number; repsPerSet: number; hangTime: number }) => {
-    setOverrides((prev) => ({ ...prev, [exerciseIndex]: params }))
-    wakeLockRequest()
-    setPhase('hanging')
-    speak('Tieni!')
-    beepStart()
-    vibrateShort()
-  }, [exerciseIndex, wakeLockRequest, speak, beepStart, vibrateShort])
+  const handleStartExercise = useCallback(
+    (params: { sets: number; repsPerSet: number; hangTime: number }) => {
+      setOverrides((prev) => ({ ...prev, [exerciseIndex]: params }))
+      wakeLockRequest()
+      setPhase('hanging')
+      speak('Tieni!')
+      beepStart()
+      vibrateShort()
+    },
+    [exerciseIndex, wakeLockRequest, speak, beepStart, vibrateShort]
+  )
 
   const handleSkipExercise = useCallback(() => {
     if (!exercise) return
@@ -161,6 +198,9 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
       setCurrentRep(1)
       setPhase('preview')
     } else {
+      setFinalDuration(
+        Math.floor((performance.now() - startTimeRef.current) / 1000)
+      )
       setPhase('workout_complete')
       wakeLockRelease()
     }
@@ -185,6 +225,9 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
           setPhase('preview')
         }, 2000)
       } else {
+        setFinalDuration(
+          Math.floor((performance.now() - startTimeRef.current) / 1000)
+        )
         setPhase('workout_complete')
         beepComplete()
         vibrateLong()
@@ -195,8 +238,17 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
       speak('Riposo tra le serie')
       setPhase('set_rest')
     }
-  }, [exercise, currentSet, exerciseIndex, exercises.length,
-    beepComplete, speak, vibrateMedium, vibrateLong, wakeLockRelease])
+  }, [
+    exercise,
+    currentSet,
+    exerciseIndex,
+    exercises.length,
+    beepComplete,
+    speak,
+    vibrateMedium,
+    vibrateLong,
+    wakeLockRelease
+  ])
 
   const handleSkipTimer = useCallback(() => {
     timer.stop()
@@ -221,17 +273,22 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
 
   const handleSave = useCallback(
     (note: string, feeling: 1 | 2 | 3 | 4 | 5) => {
-      const duration = Math.floor((Date.now() - startTimeRef.current) / 1000)
       onComplete({
         exercisesCompleted: completedExercises,
         exercisesTotal: exercises.length,
-        duration,
+        duration: finalDuration,
         skippedExercises,
         note,
-        feeling,
+        feeling
       })
     },
-    [completedExercises, exercises.length, skippedExercises, onComplete],
+    [
+      finalDuration,
+      completedExercises,
+      exercises.length,
+      skippedExercises,
+      onComplete
+    ]
   )
 
   if (phase === 'workout_complete') {
@@ -240,7 +297,7 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
         dayTitle={dayTitle}
         exercisesCompleted={completedExercises}
         exercisesTotal={exercises.length}
-        duration={Math.floor((Date.now() - startTimeRef.current) / 1000)}
+        duration={finalDuration}
         skippedExercises={skippedExercises}
         onSave={handleSave}
         onClose={onExit}
@@ -262,18 +319,25 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
   }
 
   const phaseLabel =
-    phase === 'hanging' ? 'TIENI' :
-      phase === 'resting' ? 'RIPOSA' :
-        phase === 'set_rest' ? 'RIPOSO TRA SERIE' :
-          phase === 'paused' ? 'PAUSA' :
-            phase === 'exercise_complete' ? 'COMPLETATO' : ''
+    phase === 'hanging'
+      ? 'TIENI'
+      : phase === 'resting'
+        ? 'RIPOSA'
+        : phase === 'set_rest'
+          ? 'RIPOSO TRA SERIE'
+          : phase === 'paused'
+            ? 'PAUSA'
+            : phase === 'exercise_complete'
+              ? 'COMPLETATO'
+              : ''
 
   const currentTotalTime =
-    phase === 'hanging' || phase === 'paused' && wasPausedPhase === 'hanging'
-      ? exercise?.hangTime ?? 0
-      : phase === 'resting' || phase === 'paused' && wasPausedPhase === 'resting'
-        ? exercise?.restBetweenReps ?? 0
-        : exercise?.restBetweenSets ?? 0
+    phase === 'hanging' || (phase === 'paused' && wasPausedPhase === 'hanging')
+      ? (exercise?.hangTime ?? 0)
+      : phase === 'resting' ||
+          (phase === 'paused' && wasPausedPhase === 'resting')
+        ? (exercise?.restBetweenReps ?? 0)
+        : (exercise?.restBetweenSets ?? 0)
 
   if (isRepsExercise && phase === 'hanging') {
     return (
@@ -286,17 +350,17 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             exit={{ opacity: 0 }}
             className="flex flex-col items-center"
           >
-
             <div className="flex items-center gap-3 mb-3">
               {Array.from({ length: exercise?.sets ?? 0 }, (_, i) => (
                 <div
                   key={i}
-                  className={`h-2 rounded-full transition-all duration-300 ${i < currentSet
-                    ? 'w-8 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
-                    : i === currentSet - 1
-                      ? 'w-8 bg-primary'
-                      : 'w-5 bg-surface-elevated'
-                    }`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i < currentSet
+                      ? 'w-8 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
+                      : i === currentSet - 1
+                        ? 'w-8 bg-primary'
+                        : 'w-5 bg-surface-elevated'
+                  }`}
                 />
               ))}
             </div>
@@ -308,7 +372,11 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             <div className="relative flex items-center justify-center mb-2">
               <div
                 className="absolute rounded-full blur-3xl opacity-40"
-                style={{ width: 160, height: 160, backgroundColor: '#E8175D40' }}
+                style={{
+                  width: 160,
+                  height: 160,
+                  backgroundColor: '#E8175D40'
+                }}
               />
               <div className="w-52 h-52 rounded-full border-[6px] border-primary/20 flex flex-col items-center justify-center">
                 <p className="font-timer text-7xl text-primary leading-none">
@@ -335,7 +403,16 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
               onClick={handleRepsSetDone}
               className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 mt-8"
             >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F5F5F7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#F5F5F7"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </motion.button>
@@ -345,7 +422,16 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
               className="mt-6 w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
               title="Salta esercizio"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8E8EA0"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -370,7 +456,9 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
                 className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
                 onClick={(e) => e.stopPropagation()}
               >
-                <p className="text-text font-semibold mb-1">Saltare esercizio?</p>
+                <p className="text-text font-semibold mb-1">
+                  Saltare esercizio?
+                </p>
                 <p className="text-sm text-text-muted mb-5">
                   L&apos;esercizio verrà segnato come saltato.
                 </p>
@@ -410,17 +498,21 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
             <div className="flex items-center gap-2 mb-3">
               {Array.from({ length: exercise.repsPerSet }, (_, i) => {
                 const activePhase = phase === 'paused' ? wasPausedPhase : phase
-                const isDone = i < currentRep - 1 || (i === currentRep - 1 && activePhase !== 'hanging')
-                const isCurrent = i === currentRep - 1 && activePhase === 'hanging'
+                const isDone =
+                  i < currentRep - 1 ||
+                  (i === currentRep - 1 && activePhase !== 'hanging')
+                const isCurrent =
+                  i === currentRep - 1 && activePhase === 'hanging'
                 return (
                   <div
                     key={i}
-                    className={`h-2 rounded-full transition-all duration-300 ${isDone
-                      ? 'w-6 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
-                      : isCurrent
-                        ? 'w-6 bg-primary/50'
-                        : 'w-4 bg-surface-elevated'
-                      }`}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      isDone
+                        ? 'w-6 bg-primary shadow-[0_0_8px_rgba(232,23,93,0.4)]'
+                        : isCurrent
+                          ? 'w-6 bg-primary/50'
+                          : 'w-4 bg-surface-elevated'
+                    }`}
                   />
                 )
               })}
@@ -447,7 +539,16 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
               className="w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
               title="Salta esercizio"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8E8EA0"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -479,7 +580,16 @@ export default function WorkoutRunner({ exercises, dayTitle, onComplete, onExit 
               className="w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
               title="Salta timer"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8E8EA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8E8EA0"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="5 4 15 12 5 20" />
                 <line x1="19" y1="5" x2="19" y2="19" />
               </svg>
