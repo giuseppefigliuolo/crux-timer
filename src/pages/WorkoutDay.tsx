@@ -387,7 +387,11 @@ function ExerciseDetailModal({
       />
 
       <motion.div
-        className="relative w-full max-w-lg max-h-[85dvh] rounded-t-2xl overflow-hidden"
+        className="relative w-full max-w-lg max-h-[85dvh] overflow-hidden border-[3px] border-b-0 border-[#3A1248]"
+        style={{
+          borderRadius: '1.75rem 1.25rem 0 0 / 1.25rem 1.75rem 0 0',
+          boxShadow: '0 -4px 0px #3A1248, inset 0 2px 0 rgba(255,255,255,0.55)',
+        }}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
@@ -395,16 +399,29 @@ function ExerciseDetailModal({
       >
         <motion.div
           ref={sheetRef}
-          className="bg-surface rounded-t-2xl overflow-y-auto overscroll-contain max-h-[85dvh]"
+          className="bg-surface overflow-y-auto overscroll-contain max-h-[85dvh]"
           style={{ y: dragY, scale: sheetScale, opacity: sheetOpacity }}
         >
           <div className="sticky top-0 z-10 flex justify-center pt-3 pb-2 bg-surface">
-            <div className="w-10 h-1 rounded-full bg-text-muted/30" />
+            <div
+              className="w-12 h-1.5 border-[1.5px] border-[#3A1248]"
+              style={{
+                borderRadius: '1.5rem 1rem 1.5rem 1rem / 1rem 1.5rem 1rem 1.5rem',
+                backgroundColor: '#EDE0B2',
+                boxShadow: '1px 1px 0px #3A1248',
+              }}
+            />
           </div>
 
           <div className="px-5 pb-8">
             <div className="flex flex-col items-center text-center mb-5">
-              <div className="w-28 h-28 rounded-2xl bg-surface-elevated flex items-center justify-center mb-4">
+              <div
+                className="w-28 h-28 bg-surface-elevated flex items-center justify-center mb-4 border-[2.5px] border-[#3A1248]"
+                style={{
+                  borderRadius: '2rem 1.4rem 2rem 1.4rem / 1.4rem 2rem 1.4rem 2rem',
+                  boxShadow: '3px 3px 0px #3A1248, inset 0 1px 0 rgba(255,255,255,0.5)',
+                }}
+              >
                 <ExerciseIllustration name={exercise.illustration} size={96} />
               </div>
               <h2 className="text-lg font-bold text-text">{exercise.name}</h2>

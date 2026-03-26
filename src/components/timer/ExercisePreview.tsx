@@ -62,21 +62,41 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
       transition={{ duration: 0.3 }}
     >
       <motion.div
-        className="flex flex-col items-center text-center px-6"
-        style={{ y: dragY, opacity: cardOpacity, scale: cardScale }}
+        className="flex flex-col items-center text-center px-6 py-5 mx-4 border-[3px] border-[#3A1248]"
+        style={{
+          y: dragY,
+          opacity: cardOpacity,
+          scale: cardScale,
+          backgroundColor: '#FFF8E8',
+          borderRadius: '1.75rem 1.25rem 1.75rem 1.25rem / 1.25rem 1.75rem 1.25rem 1.75rem',
+          boxShadow: '5px 5px 0px #3A1248, inset 0 2px 0 rgba(255,255,255,0.55)',
+        }}
         drag="y"
         dragDirectionLock
         dragConstraints={{ top: 0 }}
         dragElastic={{ top: 0.05, bottom: 0.6 }}
         onDragEnd={handleDragEnd}
       >
-        <div className="w-10 h-1 rounded-full bg-text-muted/40 mb-4 shrink-0 cursor-grab active:cursor-grabbing" />
+        <div
+          className="w-12 h-1.5 mb-4 shrink-0 cursor-grab active:cursor-grabbing border-[1.5px] border-[#3A1248]"
+          style={{
+            borderRadius: '1.5rem 1rem 1.5rem 1rem / 1rem 1.5rem 1rem 1.5rem',
+            backgroundColor: '#EDE0B2',
+            boxShadow: '1px 1px 0px #3A1248',
+          }}
+        />
 
         <Badge variant="accent" className="mb-4">
           Esercizio {exerciseIndex + 1} di {totalExercises}
         </Badge>
 
-        <div className="w-24 h-24 rounded-2xl bg-surface-elevated flex items-center justify-center mb-4">
+        <div
+          className="w-24 h-24 bg-surface-elevated flex items-center justify-center mb-4 border-[2.5px] border-[#3A1248]"
+          style={{
+            borderRadius: '2rem 1.4rem 2rem 1.4rem / 1.4rem 2rem 1.4rem 2rem',
+            boxShadow: '3px 3px 0px #3A1248, inset 0 1px 0 rgba(255,255,255,0.5)',
+          }}
+        >
           <ExerciseIllustration name={exercise.illustration} size={72} />
         </div>
 
