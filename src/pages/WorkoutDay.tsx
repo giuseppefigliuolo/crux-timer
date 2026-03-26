@@ -145,41 +145,82 @@ export default function WorkoutDay() {
 }
 
 const flowerColors = [
-  { petals: '#D4541A', center: '#E8B820' },
-  { petals: '#7B3A9E', center: '#17A8A8' },
-  { petals: '#17A8A8', center: '#E8B820' },
-  { petals: '#E84830', center: '#D4541A' },
-  { petals: '#5A9A1E', center: '#E8B820' },
-  { petals: '#E8B820', center: '#7B3A9E' },
-  { petals: '#D4541A', center: '#5A9A1E' },
-  { petals: '#7B3A9E', center: '#E84830' }
+  { outer: '#D4541A', inner: '#E8B820', center: '#7B3A9E', ring: '#3A1248' },
+  { outer: '#7B3A9E', inner: '#17A8A8', center: '#E8B820', ring: '#3A1248' },
+  { outer: '#17A8A8', inner: '#5A9A1E', center: '#D4541A', ring: '#3A1248' },
+  { outer: '#E84830', inner: '#D4541A', center: '#E8B820', ring: '#3A1248' },
+  { outer: '#5A9A1E', inner: '#E8B820', center: '#17A8A8', ring: '#3A1248' },
+  { outer: '#E8B820', inner: '#7B3A9E', center: '#D4541A', ring: '#3A1248' },
+  { outer: '#D4541A', inner: '#5A9A1E', center: '#E84830', ring: '#3A1248' },
+  { outer: '#7B3A9E', inner: '#E84830', center: '#E8B820', ring: '#3A1248' }
 ]
 
 function ExerciseFlowerNumber({ index }: { index: number }) {
-  const colors = flowerColors[index % flowerColors.length]
+  const c = flowerColors[index % flowerColors.length]
+  // Each flower has a unique rotation offset for variety
+  const baseRotation = (index * 13) % 360
   return (
-    <div className="relative flex items-center justify-center w-10 h-10 shrink-0">
+    <div className="relative flex items-center justify-center w-11 h-11 shrink-0">
       <svg
-        width="40"
-        height="40"
-        viewBox="0 0 40 40"
+        width="44"
+        height="44"
+        viewBox="0 0 44 44"
         className="absolute inset-0"
       >
-        {Array.from({ length: 6 }, (_, i) => (
-          <ellipse
-            key={i}
-            cx="20"
-            cy="20"
-            rx="5"
-            ry="12"
-            fill={colors.petals}
-            opacity={0.7}
-            transform={`rotate(${i * 60} 20 20)`}
-          />
-        ))}
-        <circle cx="20" cy="20" r="9" fill={colors.center} />
+        <g transform={`rotate(${baseRotation} 22 22)`}>
+          {/* Outer wavy petals — organic blob shapes */}
+          {Array.from({ length: 7 }, (_, i) => {
+            const angle = (i * 360) / 7
+            const rad = (angle * Math.PI) / 180
+            const px = 22 + Math.cos(rad) * 13
+            const py = 22 + Math.sin(rad) * 13
+            // Vary petal size for organic feel
+            const rx = 5.5 + (i % 3) * 0.8
+            const ry = 8 + (i % 2) * 2
+            return (
+              <ellipse
+                key={`o-${i}`}
+                cx={px}
+                cy={py}
+                rx={rx}
+                ry={ry}
+                fill={c.outer}
+                opacity={0.85}
+                transform={`rotate(${angle + 90} ${px} ${py})`}
+              />
+            )
+          })}
+          {/* Inner petals — offset, smaller, different color */}
+          {Array.from({ length: 7 }, (_, i) => {
+            const angle = (i * 360) / 7 + 25
+            const rad = (angle * Math.PI) / 180
+            const px = 22 + Math.cos(rad) * 9
+            const py = 22 + Math.sin(rad) * 9
+            const rx = 3.5 + (i % 2) * 0.6
+            const ry = 6 + (i % 3)
+            return (
+              <ellipse
+                key={`in-${i}`}
+                cx={px}
+                cy={py}
+                rx={rx}
+                ry={ry}
+                fill={c.inner}
+                opacity={0.9}
+                transform={`rotate(${angle + 90} ${px} ${py})`}
+              />
+            )
+          })}
+        </g>
+        {/* Center — concentric rings for depth */}
+        <circle cx="22" cy="22" r="9" fill={c.center} />
+        <circle cx="22" cy="22" r="9" fill="none" stroke={c.ring} strokeWidth="1.5" opacity={0.3} />
+        <circle cx="22" cy="22" r="6" fill={c.inner} opacity={0.5} />
+        <circle cx="22" cy="22" r="3.5" fill={c.ring} opacity={0.25} />
+        {/* Tiny highlight dot */}
+        <circle cx="20" cy="20" r="1.5" fill="white" opacity={0.45} />
       </svg>
-      <span className="relative text-sm font-bold font-timer text-[#3A1248] z-10">
+      <span className="relative text-sm font-bold font-timer text-[#FFFBF0] z-10" style={{ textShadow: '0 1px 2px rgba(58,18,72,0.6)' }}>
         {index + 1}
       </span>
     </div>
