@@ -5,8 +5,7 @@ export default function Layout() {
   return (
     <div className="flex flex-col min-h-dvh bg-bg relative overflow-x-hidden">
 
-      {/* ── Rainbow border stripes — frame the whole app like a psychedelic poster ── */}
-      <RainbowStripes />
+      {/* Psychedelic decorations only — rainbow stripes removed */}
 
       {/* ── Large psychedelic illustrations — fixed at screen edges ── */}
       <PsychedelicDecor />
@@ -18,33 +17,6 @@ export default function Layout() {
 
       <BottomNav />
     </div>
-  )
-}
-
-/* ─── Rainbow poster border stripes ─── */
-function RainbowStripes() {
-  const colors = '#D4541A, #E8B820, #5A9A1E, #17A8A8, #7B3A9E, #E84830, #D4541A'
-  const colorsRev = '#7B3A9E, #17A8A8, #5A9A1E, #E8B820, #D4541A, #E84830, #7B3A9E'
-  return (
-    <>
-      {/* Top stripe — z-[9500] sits above grain (9000) but below nav (z-50 → 50) */}
-      {/* We need it above everything so: z-9600 */}
-      <div
-        className="fixed top-0 left-0 right-0 z-9600 pointer-events-none"
-        style={{
-          height: 6,
-          background: `linear-gradient(90deg, ${colors})`,
-        }}
-      />
-      {/* Bottom stripe */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-9600 pointer-events-none"
-        style={{
-          height: 6,
-          background: `linear-gradient(90deg, ${colorsRev})`,
-        }}
-      />
-    </>
   )
 }
 

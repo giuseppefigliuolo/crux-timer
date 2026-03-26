@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useMotionValue, useTransform, animate as motionAnimate } from 'framer-motion'
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  animate as motionAnimate
+} from 'framer-motion'
 import PageHeader from '../components/ui/PageHeader'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
@@ -10,21 +16,32 @@ import type { Exercise } from '../types'
 import { useSettingsStore } from '../store/useSettingsStore'
 import { getProgram } from '../utils/getProgram'
 import { formatSeconds } from '../utils/dateUtils'
-import { getWorkoutForDay, getDayTypeColor, getDayTypeLabel, getTotalExerciseDuration, getSessionLabel } from '../utils/programUtils'
+import {
+  getWorkoutForDay,
+  getDayTypeColor,
+  getDayTypeLabel,
+  getTotalExerciseDuration,
+  getSessionLabel
+} from '../utils/programUtils'
 
 const stagger = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.03 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.03 } }
 }
 const fadeUp = {
   hidden: { opacity: 0, y: 8 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.2 } }
 }
 
 export default function WorkoutDay() {
-  const { weekNumber, dayOfWeek } = useParams<{ weekNumber: string; dayOfWeek: string }>()
+  const { weekNumber, dayOfWeek } = useParams<{
+    weekNumber: string
+    dayOfWeek: string
+  }>()
   const navigate = useNavigate()
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+    null
+  )
   const { selectedProgram } = useSettingsStore()
   const program = getProgram(selectedProgram)
 
@@ -33,17 +50,19 @@ export default function WorkoutDay() {
 
   if (!day) {
     return (
-      <div className="flex items-center justify-center min-h-dvh">
+      <div className="flex items-center justify-center h-full">
         <p className="text-text-secondary">Workout non trovato</p>
       </div>
     )
   }
 
   const weekData = program.weeks.find((w) => w.weekNumber === week)
-  const sessionLabel = weekData ? getSessionLabel(weekData.days, day.dayOfWeek) : ''
+  const sessionLabel = weekData
+    ? getSessionLabel(weekData.days, day.dayOfWeek)
+    : ''
 
   return (
-    <div className="min-h-dvh bg-bg">
+    <div className="bg-bg">
       <PageHeader
         title={day.title}
         subtitle={`${sessionLabel} — Settimana ${week}`}
@@ -57,55 +76,125 @@ export default function WorkoutDay() {
         animate="show"
       >
         <motion.div variants={fadeUp} className="flex items-center gap-2 mb-2">
-          <Badge variant={getDayTypeColor(day.type) as 'primary' | 'secondary' | 'accent' | 'violet'}>
+          <Badge
+            variant={
+              getDayTypeColor(day.type) as
+                | 'primary'
+                | 'secondary'
+                | 'accent'
+                | 'violet'
+            }
+          >
             {getDayTypeLabel(day.type)}
           </Badge>
-          {weekData && (
-            <Badge variant="violet">
-              {weekData.theme}
-            </Badge>
-          )}
+          {weekData && <Badge variant="violet">{weekData.theme}</Badge>}
         </motion.div>
 
-        <motion.p variants={fadeUp} className="text-sm text-text-secondary mb-4">
+        <motion.p
+          variants={fadeUp}
+          className="text-sm text-text-secondary mb-4"
+        >
           {day.description}
         </motion.p>
 
-        <motion.div variants={fadeUp} className="flex items-center gap-4 text-xs text-text-muted mb-6">
+        <motion.div
+          variants={fadeUp}
+          className="flex items-center gap-4 text-xs text-text-muted mb-6"
+        >
           <span>{day.exercises.length} esercizi</span>
           <span>~{formatSeconds(getTotalExerciseDuration(day))}</span>
         </motion.div>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-24">
           {day.exercises.map((exercise, index) => (
             <motion.div key={exercise.id} variants={fadeUp}>
-              <ExerciseCard exercise={exercise} index={index} onTap={() => setSelectedExercise(exercise)} />
+              <ExerciseCard
+                exercise={exercise}
+                index={index}
+                onTap={() => setSelectedExercise(exercise)}
+              />
             </motion.div>
           ))}
         </div>
 
-        <motion.div variants={fadeUp}>
+        {/* Fixed bottom button */}
+        <div className="fixed bottom-1 left-0 right-0 z-40 px-4 pb-2 pt-3 max-w-lg mx-auto">
           <Button
             variant="primary"
             size="lg"
             fullWidth
-            onClick={() => navigate(`/workout/${weekNumber}/${dayOfWeek}/active`)}
+            onClick={() =>
+              navigate(`/workout/${weekNumber}/${dayOfWeek}/active`)
+            }
           >
             Inizia Allenamento
           </Button>
-        </motion.div>
+        </div>
       </motion.div>
 
       <AnimatePresence>
         {selectedExercise && (
-          <ExerciseDetailModal exercise={selectedExercise} onClose={() => setSelectedExercise(null)} />
+          <ExerciseDetailModal
+            exercise={selectedExercise}
+            onClose={() => setSelectedExercise(null)}
+          />
         )}
       </AnimatePresence>
     </div>
   )
 }
 
-function ExerciseCard({ exercise, index, onTap }: { exercise: Exercise; index: number; onTap: () => void }) {
+const flowerColors = [
+  { petals: '#D4541A', center: '#E8B820' },
+  { petals: '#7B3A9E', center: '#17A8A8' },
+  { petals: '#17A8A8', center: '#E8B820' },
+  { petals: '#E84830', center: '#D4541A' },
+  { petals: '#5A9A1E', center: '#E8B820' },
+  { petals: '#E8B820', center: '#7B3A9E' },
+  { petals: '#D4541A', center: '#5A9A1E' },
+  { petals: '#7B3A9E', center: '#E84830' }
+]
+
+function ExerciseFlowerNumber({ index }: { index: number }) {
+  const colors = flowerColors[index % flowerColors.length]
+  return (
+    <div className="relative flex items-center justify-center w-10 h-10 shrink-0">
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        className="absolute inset-0"
+      >
+        {Array.from({ length: 6 }, (_, i) => (
+          <ellipse
+            key={i}
+            cx="20"
+            cy="20"
+            rx="5"
+            ry="12"
+            fill={colors.petals}
+            opacity={0.7}
+            transform={`rotate(${i * 60} 20 20)`}
+          />
+        ))}
+        <circle cx="20" cy="20" r="9" fill={colors.center} />
+      </svg>
+      <span className="relative text-sm font-bold font-timer text-[#3A1248] z-10">
+        {index + 1}
+      </span>
+    </div>
+  )
+}
+
+function ExerciseCard({
+  exercise,
+  index,
+  onTap
+}: {
+  exercise: Exercise
+  index: number
+  onTap: () => void
+}) {
   const equipmentLabels: Record<string, string> = {
     hangboard: 'Hangboard',
     wooden_balls: 'Sfere legno',
@@ -113,18 +202,18 @@ function ExerciseCard({ exercise, index, onTap }: { exercise: Exercise; index: n
     dumbbells: 'Manubri',
     fitness_band: 'Elastico',
     yoga_mat: 'Tappetino',
-    bodyweight: 'Corpo libero',
+    bodyweight: 'Corpo libero'
   }
 
   return (
     <Card onClick={onTap}>
       <div className="flex items-start gap-3">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-elevated text-text-muted text-sm font-bold font-timer shrink-0">
-          {index + 1}
-        </div>
+        <ExerciseFlowerNumber index={index} />
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-text">{exercise.name}</h3>
-          <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">{exercise.description}</p>
+          <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">
+            {exercise.description}
+          </p>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-elevated text-text-muted font-medium">
@@ -132,7 +221,8 @@ function ExerciseCard({ exercise, index, onTap }: { exercise: Exercise; index: n
             </span>
             {exercise.type === 'repeaters' ? (
               <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary-soft text-primary font-medium">
-                {exercise.hangTime}s/{exercise.restBetweenReps}s × {exercise.repsPerSet} rep × {exercise.sets} set
+                {exercise.hangTime}s/{exercise.restBetweenReps}s ×{' '}
+                {exercise.repsPerSet} rep × {exercise.sets} set
               </span>
             ) : exercise.type === 'reps' ? (
               <span className="text-[11px] px-2 py-0.5 rounded-full bg-secondary-soft text-secondary font-medium">
@@ -162,7 +252,7 @@ const gripLabels: Record<string, string> = {
   three_finger_drag: 'Tre dita',
   pinch: 'Pinch',
   sloper: 'Sloper',
-  mixed: 'Mista',
+  mixed: 'Mista'
 }
 
 const equipmentLabelsModal: Record<string, string> = {
@@ -172,10 +262,16 @@ const equipmentLabelsModal: Record<string, string> = {
   dumbbells: 'Manubri',
   fitness_band: 'Elastico',
   yoga_mat: 'Tappetino',
-  bodyweight: 'Corpo libero',
+  bodyweight: 'Corpo libero'
 }
 
-function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClose: () => void }) {
+function ExerciseDetailModal({
+  exercise,
+  onClose
+}: {
+  exercise: Exercise
+  onClose: () => void
+}) {
   const dragY = useMotionValue(0)
   const sheetScale = useTransform(dragY, [0, 300], [1, 0.95])
   const sheetOpacity = useTransform(dragY, [0, 300], [1, 0.4])
@@ -204,7 +300,7 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
       const delta = y - startY
       const now = performance.now()
       const dt = now - lastTime
-      if (dt > 0) velY = (y - lastY) / dt * 1000
+      if (dt > 0) velY = ((y - lastY) / dt) * 1000
       lastY = y
       lastTime = now
 
@@ -229,7 +325,7 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
         motionAnimate(dragY, window.innerHeight, {
           duration: 0.25,
           ease: 'easeIn',
-          onComplete: onClose,
+          onComplete: onClose
         })
       } else {
         motionAnimate(dragY, 0, { type: 'spring', stiffness: 400, damping: 30 })
@@ -335,9 +431,21 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-5">
-              <DetailCell label="Serie" value={String(exercise.sets)} color="text-primary" />
-              <DetailCell label="Ripetizioni" value={String(exercise.repsPerSet)} color="text-secondary" />
-              <DetailCell label="Tempo" value={`${exercise.hangTime}s`} color="text-accent" />
+              <DetailCell
+                label="Serie"
+                value={String(exercise.sets)}
+                color="text-primary"
+              />
+              <DetailCell
+                label="Ripetizioni"
+                value={String(exercise.repsPerSet)}
+                color="text-secondary"
+              />
+              <DetailCell
+                label="Tempo"
+                value={`${exercise.hangTime}s`}
+                color="text-accent"
+              />
               <DetailCell
                 label="Recupero set"
                 value={`${exercise.restBetweenSets}s`}
@@ -353,9 +461,11 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
             </div>
 
             {exercise.notes && (
-              <div className="rounded-xl bg-accent-soft/30 border border-accent/10 px-4 py-3 mb-5">
-                <p className="text-xs text-accent font-semibold uppercase tracking-wider mb-1">Note</p>
-                <p className="text-sm text-text-secondary">{exercise.notes}</p>
+              <div className="rounded-xl bg-accent-soft border border-accent/30 px-4 py-3 mb-5">
+                <p className="text-xs text-text font-semibold uppercase tracking-wider mb-1">
+                  Note
+                </p>
+                <p className="text-sm text-text">{exercise.notes}</p>
               </div>
             )}
 
@@ -369,11 +479,21 @@ function ExerciseDetailModal({ exercise, onClose }: { exercise: Exercise; onClos
   )
 }
 
-function DetailCell({ label, value, color }: { label: string; value: string; color: string }) {
+function DetailCell({
+  label,
+  value,
+  color
+}: {
+  label: string
+  value: string
+  color: string
+}) {
   return (
     <div className="bg-surface-elevated rounded-xl p-3 text-center">
       <p className={`text-lg font-bold font-timer ${color}`}>{value}</p>
-      <p className="text-[11px] uppercase tracking-wider text-text-muted">{label}</p>
+      <p className="text-[11px] uppercase tracking-wider text-text-muted">
+        {label}
+      </p>
     </div>
   )
 }

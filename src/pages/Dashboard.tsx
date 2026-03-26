@@ -123,7 +123,13 @@ function StatCard({ label, value, color }: { label: string; value: string; color
     violet: 'text-violet',
   }
   return (
-    <div className="bg-surface rounded-xl border border-border p-3 text-center">
+    <div
+      className="bg-surface border-[2.5px] border-[#3A1248] p-3 text-center"
+      style={{
+        borderRadius: '2.2rem 1.6rem 2rem 1.4rem / 1.5rem 2.2rem 1.6rem 2rem',
+        boxShadow: '3px 3px 0px #3A1248, inset 0 1px 0 rgba(255,255,255,0.4)',
+      }}
+    >
       <p className={`text-xl font-bold font-timer ${colorClasses[color] ?? 'text-text'}`}>{value}</p>
       <p className="text-[11px] uppercase tracking-wider text-text-muted mt-0.5">{label}</p>
     </div>
