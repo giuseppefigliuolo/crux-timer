@@ -7,27 +7,38 @@ import { useSettingsStore } from '../store/useSettingsStore'
 import { getProgram } from '../utils/getProgram'
 import type { DayType } from '../types'
 import { getWeekNumber, formatSeconds } from '../utils/dateUtils'
-import { getTotalExerciseDuration, getSessionLabel } from '../utils/programUtils'
+import {
+  getTotalExerciseDuration,
+  getSessionLabel
+} from '../utils/programUtils'
 import { fireConfettiFromEvent } from '../utils/confetti'
 import { RADIUS, SHADOW } from '../styles/tokens'
 
 const stagger = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.04 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.04 } }
 }
 
 const fadeUp = {
   hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25 } }
 }
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { programStartDate, setProgramStartDate, getCompletedCount, getStreak, completedWorkouts } = useWorkoutStore()
+  const {
+    programStartDate,
+    setProgramStartDate,
+    getCompletedCount,
+    getStreak,
+    completedWorkouts
+  } = useWorkoutStore()
   const { selectedProgram } = useSettingsStore()
   const program = getProgram(selectedProgram)
 
-  const weekNumber = programStartDate ? getWeekNumber(programStartDate, program.durationWeeks) : 1
+  const weekNumber = programStartDate
+    ? getWeekNumber(programStartDate, program.durationWeeks)
+    : 1
   const currentWeek = program.weeks.find((w) => w.weekNumber === weekNumber)
 
   const todayDate = new Date().toISOString().split('T')[0]
@@ -45,11 +56,12 @@ export default function Dashboard() {
       animate="show"
     >
       <motion.div variants={fadeUp} className="mb-6">
-        <h1 className="text-4xl tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-          <span className="text-gradient-primary">Crux</span>
-          <span className="text-text">Timer</span>
-        </h1>
-        <p className="text-text-secondary text-sm mt-1">
+        <img
+          src={`${import.meta.env.BASE_URL}icons/logo-straight.png`}
+          alt="LSDita"
+          className="h-18 mx-auto"
+        />
+        <p className="text-text-secondary text-sm mt-1 text-center">
           {currentWeek
             ? `Settimana ${weekNumber} — ${currentWeek.theme}`
             : 'Il tuo programma di arrampicata'}
@@ -60,11 +72,16 @@ export default function Dashboard() {
         <motion.div variants={fadeUp} className="mb-6">
           <Card variant="primary" className="border-primary/30 bg-primary/5">
             <div className="text-center py-2">
-              <p className="text-lg font-bold text-text mb-1">Pronto per iniziare?</p>
-              <p className="text-sm text-text-secondary mb-4">
-                {program.name}
+              <p className="text-lg font-bold text-text mb-1">
+                Pronto per iniziare?
               </p>
-              <Button variant="primary" size="lg" fullWidth onClick={handleStartProgram}>
+              <p className="text-sm text-text-secondary mb-4">{program.name}</p>
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                onClick={handleStartProgram}
+              >
                 Inizia il Programma
               </Button>
             </div>
@@ -73,9 +90,17 @@ export default function Dashboard() {
       )}
 
       <motion.div variants={fadeUp} className="grid grid-cols-3 gap-3 mb-6">
-        <StatCard label="Completati" value={String(getCompletedCount())} color="primary" />
+        <StatCard
+          label="Completati"
+          value={String(getCompletedCount())}
+          color="primary"
+        />
         <StatCard label="Streak" value={`${getStreak()}g`} color="accent" />
-        <StatCard label="Settimana" value={`${weekNumber}/${program.durationWeeks}`} color="violet" />
+        <StatCard
+          label="Settimana"
+          value={`${weekNumber}/${program.durationWeeks}`}
+          color="violet"
+        />
       </motion.div>
 
       <motion.div variants={fadeUp}>
@@ -85,24 +110,44 @@ export default function Dashboard() {
         <div className="space-y-2">
           {currentWeek?.days.map((day) => {
             const dayCompleted = completedWorkouts.some(
-              (w) => w.weekNumber === weekNumber && w.dayType === day.type && w.date === todayDate,
+              (w) =>
+                w.weekNumber === weekNumber &&
+                w.dayType === day.type &&
+                w.date === todayDate
             )
             return (
               <Card
                 key={day.dayOfWeek}
-                onClick={() => navigate(`/workout/${weekNumber}/${day.dayOfWeek}`)}
+                onClick={() =>
+                  navigate(`/workout/${weekNumber}/${day.dayOfWeek}`)
+                }
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <DayDot type={day.type} completed={dayCompleted} />
                     <div>
-                      <p className="text-sm font-semibold text-text">{currentWeek ? getSessionLabel(currentWeek.days, day.dayOfWeek) : ''}</p>
+                      <p className="text-sm font-semibold text-text">
+                        {currentWeek
+                          ? getSessionLabel(currentWeek.days, day.dayOfWeek)
+                          : ''}
+                      </p>
                       <p className="text-xs text-text-secondary">{day.title}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-text-muted">~{formatSeconds(getTotalExerciseDuration(day))}</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C7355" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <span className="text-[11px] text-text-muted">
+                      ~{formatSeconds(getTotalExerciseDuration(day))}
+                    </span>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#8C7355"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </div>
@@ -116,23 +161,37 @@ export default function Dashboard() {
   )
 }
 
-function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
+function StatCard({
+  label,
+  value,
+  color
+}: {
+  label: string
+  value: string
+  color: string
+}) {
   const colorClasses: Record<string, string> = {
     primary: 'text-primary',
     accent: 'text-accent',
     secondary: 'text-secondary',
-    violet: 'text-violet',
+    violet: 'text-violet'
   }
   return (
     <div
       className="bg-surface border-[2.5px] border-[#3A1248] p-3 text-center"
       style={{
         borderRadius: RADIUS.stat,
-        boxShadow: SHADOW.sm,
+        boxShadow: SHADOW.sm
       }}
     >
-      <p className={`text-xl font-bold font-timer ${colorClasses[color] ?? 'text-text'}`}>{value}</p>
-      <p className="text-[11px] uppercase tracking-wider text-text-muted mt-0.5">{label}</p>
+      <p
+        className={`text-xl font-bold font-timer ${colorClasses[color] ?? 'text-text'}`}
+      >
+        {value}
+      </p>
+      <p className="text-[11px] uppercase tracking-wider text-text-muted mt-0.5">
+        {label}
+      </p>
     </div>
   )
 }
@@ -142,13 +201,22 @@ function DayDot({ type, completed }: { type: DayType; completed: boolean }) {
     finger_strength: 'bg-primary',
     pull_strength: 'bg-accent',
     power_endurance: 'bg-secondary',
-    mobility: 'bg-violet',
+    mobility: 'bg-violet'
   }
 
   if (completed) {
     return (
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success/20">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5CB87A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#5CB87A"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
@@ -156,8 +224,12 @@ function DayDot({ type, completed }: { type: DayType; completed: boolean }) {
   }
 
   return (
-    <div className={`w-8 h-8 rounded-full ${colors[type] ?? 'bg-text-muted'} opacity-25 flex items-center justify-center`}>
-      <div className={`w-3 h-3 rounded-full ${colors[type] ?? 'bg-text-muted'} opacity-100`} />
+    <div
+      className={`w-8 h-8 rounded-full ${colors[type] ?? 'bg-text-muted'} opacity-25 flex items-center justify-center`}
+    >
+      <div
+        className={`w-3 h-3 rounded-full ${colors[type] ?? 'bg-text-muted'} opacity-100`}
+      />
     </div>
   )
 }
