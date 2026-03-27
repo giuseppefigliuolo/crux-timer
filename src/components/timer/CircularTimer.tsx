@@ -24,6 +24,7 @@ const VIEW = 260
 const phaseColors: Record<string, {
   fill: string; bg: string; rays: string; textOnFill: string
 }> = {
+  countdown:         { fill: '#E8B820', bg: '#FDF7E3', rays: '#D4541A',  textOnFill: '#2D0E4A' },
   hanging:           { fill: '#D4541A', bg: '#FDEEE4', rays: '#E8B820',  textOnFill: '#FFFBF0' },
   resting:           { fill: '#17A8A8', bg: '#E2F6F6', rays: '#5A9A1E',  textOnFill: '#2D0E4A' },
   set_rest:          { fill: '#7B3A9E', bg: '#F2EAF8', rays: '#E84830',  textOnFill: '#FFFBF0' },
@@ -53,7 +54,7 @@ export default function CircularTimer({ timeRemaining, totalTime, phase, label, 
     const controls = animate(blobPath, BLOBS, {
       duration: 10,
       repeat: Infinity,
-      repeatType: 'loop',
+      repeatType: 'mirror',
       ease: 'easeInOut',
     })
     return () => controls.stop()

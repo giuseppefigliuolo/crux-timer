@@ -56,14 +56,13 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-    >
+    <>
       <motion.div
         className="flex flex-col items-center text-center px-6 py-5 mx-4 border-[3px] border-[#3A1248]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
         style={{
           y: dragY,
           opacity: cardOpacity,
@@ -212,7 +211,7 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </>
   )
 }
 

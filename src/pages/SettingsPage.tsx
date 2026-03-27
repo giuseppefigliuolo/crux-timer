@@ -125,6 +125,41 @@ export default function SettingsPage() {
 
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
+            Timer
+          </h2>
+          <Card>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-text">Countdown iniziale</p>
+                <p className="text-xs text-text-secondary">
+                  Secondi prima che l'esercizio parta
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => settings.setCountdownDuration(Math.max(0, settings.countdownDuration - 1))}
+                  disabled={settings.countdownDuration <= 0}
+                  className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-sm font-bold text-text disabled:opacity-30"
+                >
+                  −
+                </button>
+                <span className="w-8 text-center font-bold font-timer text-primary">
+                  {settings.countdownDuration}
+                </span>
+                <button
+                  onClick={() => settings.setCountdownDuration(Math.min(10, settings.countdownDuration + 1))}
+                  disabled={settings.countdownDuration >= 10}
+                  className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-sm font-bold text-text disabled:opacity-30"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        <section>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
             Volume
           </h2>
           <Card>

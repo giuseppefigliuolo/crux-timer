@@ -9,6 +9,7 @@ import { useAudio } from '../../hooks/useAudio'
 import { useSpeech } from '../../hooks/useSpeech'
 import { useVibration } from '../../hooks/useVibration'
 import { useWakeLock } from '../../hooks/useWakeLock'
+import { useSettingsStore } from '../../store/useSettingsStore'
 import { INK, RADIUS, SHADOW } from '../../styles/tokens'
 
 interface WorkoutRunnerProps {
@@ -47,6 +48,9 @@ export default function WorkoutRunner({
   const startTimeRef = useRef(0)
   const [finalDuration, setFinalDuration] = useState(0)
   const lastCountdownRef = useRef(0)
+  const resumingRef = useRef(false)
+  const skippedTimerRef = useRef(false)
+  const countdownDuration = useSettingsStore((s) => s.countdownDuration)
 
   useEffect(() => {
     startTimeRef.current = performance.now()
@@ -65,8 +69,18 @@ export default function WorkoutRunner({
       : baseExercise
   }, [baseExercise, exerciseOverride])
 
+  const isRepsExercise = exercise?.type === 'reps'
+
   const handleTimerComplete = useCallback(() => {
     if (!exercise) return
+
+    if (phase === 'countdown') {
+      setPhase('hanging')
+      speak('Tieni!')
+      beepStart()
+      vibrateShort()
+      return
+    }
 
     if (phase === 'hanging') {
       beepEnd()
@@ -113,17 +127,31 @@ export default function WorkoutRunner({
       }
     } else if (phase === 'resting') {
       setCurrentRep((r) => r + 1)
-      setPhase('hanging')
-      speak('Tieni!')
-      beepStart()
-      vibrateShort()
+      const wasSkipped = skippedTimerRef.current
+      skippedTimerRef.current = false
+      if (wasSkipped && countdownDuration > 0 && !isRepsExercise) {
+        setPhase('countdown')
+        speak('Preparati!')
+      } else {
+        setPhase('hanging')
+        speak('Tieni!')
+        beepStart()
+        vibrateShort()
+      }
     } else if (phase === 'set_rest') {
       setCurrentSet((s) => s + 1)
       setCurrentRep(1)
-      setPhase('hanging')
-      speak(`Serie ${currentSet + 1}. Tieni!`)
-      beepStart()
-      vibrateShort()
+      const wasSkipped = skippedTimerRef.current
+      skippedTimerRef.current = false
+      if (wasSkipped && countdownDuration > 0 && !isRepsExercise) {
+        setPhase('countdown')
+        speak('Preparati!')
+      } else {
+        setPhase('hanging')
+        speak(`Serie ${currentSet + 1}. Tieni!`)
+        beepStart()
+        vibrateShort()
+      }
     }
   }, [
     phase,
@@ -132,6 +160,8 @@ export default function WorkoutRunner({
     currentSet,
     exerciseIndex,
     exercises.length,
+    isRepsExercise,
+    countdownDuration,
     beepStart,
     beepEnd,
     beepComplete,
@@ -144,12 +174,19 @@ export default function WorkoutRunner({
 
   const timer = useTimer(handleTimerComplete)
 
-  const isRepsExercise = exercise?.type === 'reps'
-
   useEffect(() => {
     if (!exercise) return
 
-    if (phase === 'hanging') {
+    // Skip timer.start() when resuming from pause — timer.resume() handles it
+    if (resumingRef.current) {
+      resumingRef.current = false
+      return
+    }
+
+    if (phase === 'countdown') {
+      timer.start(countdownDuration)
+      lastCountdownRef.current = 0
+    } else if (phase === 'hanging') {
       if (!isRepsExercise) {
         timer.start(exercise.hangTime)
         lastCountdownRef.current = 0
@@ -161,10 +198,23 @@ export default function WorkoutRunner({
       timer.start(exercise.restBetweenSets)
       lastCountdownRef.current = 0
     }
-  }, [phase, exercise, exerciseIndex, currentSet, currentRep, isRepsExercise]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    phase,
+    exercise,
+    exerciseIndex,
+    currentSet,
+    currentRep,
+    isRepsExercise,
+    countdownDuration
+  ]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (phase !== 'hanging' && phase !== 'resting' && phase !== 'set_rest')
+    if (
+      phase !== 'countdown' &&
+      phase !== 'hanging' &&
+      phase !== 'resting' &&
+      phase !== 'set_rest'
+    )
       return
     const remaining = Math.ceil(timer.timeRemaining)
     if (
@@ -181,12 +231,28 @@ export default function WorkoutRunner({
     (params: { sets: number; repsPerSet: number; hangTime: number }) => {
       setOverrides((prev) => ({ ...prev, [exerciseIndex]: params }))
       wakeLockRequest()
-      setPhase('hanging')
-      speak('Tieni!')
-      beepStart()
-      vibrateShort()
+
+      // Reps exercises don't need a countdown
+      const exerciseType = exercises[exerciseIndex]?.type
+      if (exerciseType === 'reps' || countdownDuration <= 0) {
+        setPhase('hanging')
+        speak('Tieni!')
+        beepStart()
+        vibrateShort()
+      } else {
+        setPhase('countdown')
+        speak('Preparati!')
+      }
     },
-    [exerciseIndex, wakeLockRequest, speak, beepStart, vibrateShort]
+    [
+      exerciseIndex,
+      exercises,
+      countdownDuration,
+      wakeLockRequest,
+      speak,
+      beepStart,
+      vibrateShort
+    ]
   )
 
   const handleSkipExercise = useCallback(() => {
@@ -252,6 +318,7 @@ export default function WorkoutRunner({
   ])
 
   const handleSkipTimer = useCallback(() => {
+    skippedTimerRef.current = true
     timer.stop()
     handleTimerComplete()
   }, [timer, handleTimerComplete])
@@ -263,6 +330,7 @@ export default function WorkoutRunner({
   }, [timer, phase])
 
   const handleResume = useCallback(() => {
+    resumingRef.current = true
     setPhase(wasPausedPhase)
     timer.resume()
   }, [timer, wasPausedPhase])
@@ -320,25 +388,29 @@ export default function WorkoutRunner({
   }
 
   const phaseLabel =
-    phase === 'hanging'
-      ? 'TIENI'
-      : phase === 'resting'
-        ? 'RIPOSA'
-        : phase === 'set_rest'
-          ? 'RIPOSO TRA SERIE'
-          : phase === 'paused'
-            ? 'PAUSA'
-            : phase === 'exercise_complete'
-              ? 'COMPLETATO'
-              : ''
+    phase === 'countdown'
+      ? 'PREPARATI'
+      : phase === 'hanging'
+        ? 'TIENI'
+        : phase === 'resting'
+          ? 'RIPOSA'
+          : phase === 'set_rest'
+            ? 'RIPOSO TRA SERIE'
+            : phase === 'paused'
+              ? 'PAUSA'
+              : phase === 'exercise_complete'
+                ? 'COMPLETATO'
+                : ''
 
+  const activePhaseForTime = phase === 'paused' ? wasPausedPhase : phase
   const currentTotalTime =
-    phase === 'hanging' || (phase === 'paused' && wasPausedPhase === 'hanging')
-      ? (exercise?.hangTime ?? 0)
-      : phase === 'resting' ||
-          (phase === 'paused' && wasPausedPhase === 'resting')
-        ? (exercise?.restBetweenReps ?? 0)
-        : (exercise?.restBetweenSets ?? 0)
+    activePhaseForTime === 'countdown'
+      ? countdownDuration
+      : activePhaseForTime === 'hanging'
+        ? (exercise?.hangTime ?? 0)
+        : activePhaseForTime === 'resting'
+          ? (exercise?.restBetweenReps ?? 0)
+          : (exercise?.restBetweenSets ?? 0)
 
   if (isRepsExercise && phase === 'hanging') {
     return (
@@ -530,7 +602,12 @@ export default function WorkoutRunner({
               totalTime={currentTotalTime}
               phase={phase === 'paused' ? wasPausedPhase : phase}
               label={phaseLabel}
-              subLabel={`Serie ${currentSet}/${exercise?.sets ?? 0}  •  Rep ${currentRep}/${exercise?.repsPerSet ?? 0}`}
+              subLabel={
+                phase === 'countdown' ||
+                (phase === 'paused' && wasPausedPhase === 'countdown')
+                  ? 'Posizionati!'
+                  : `Serie ${currentSet}/${exercise?.sets ?? 0}  •  Rep ${currentRep}/${exercise?.repsPerSet ?? 0}`
+              }
             />
           </div>
 
@@ -540,7 +617,7 @@ export default function WorkoutRunner({
               className="w-14 h-14 bg-surface border-[2.5px] border-[#3A1248] flex items-center justify-center active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
               style={{
                 borderRadius: RADIUS.controlSm,
-                boxShadow: SHADOW.sm,
+                boxShadow: SHADOW.sm
               }}
               title="Salta esercizio"
             >
@@ -565,7 +642,7 @@ export default function WorkoutRunner({
                 className="w-20 h-20 bg-accent border-[3px] border-[#3A1248] flex items-center justify-center active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
                 style={{
                   borderRadius: RADIUS.controlLg,
-                  boxShadow: SHADOW.md,
+                  boxShadow: SHADOW.md
                 }}
               >
                 <svg width="32" height="32" viewBox="0 0 24 24" fill={INK}>
@@ -578,7 +655,7 @@ export default function WorkoutRunner({
                 className="w-20 h-20 bg-surface border-[3px] border-[#3A1248] flex items-center justify-center active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
                 style={{
                   borderRadius: RADIUS.controlLg,
-                  boxShadow: SHADOW.md,
+                  boxShadow: SHADOW.md
                 }}
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill={INK}>
@@ -593,7 +670,7 @@ export default function WorkoutRunner({
               className="w-14 h-14 bg-surface border-[2.5px] border-[#3A1248] flex items-center justify-center active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
               style={{
                 borderRadius: RADIUS.controlSm,
-                boxShadow: SHADOW.sm,
+                boxShadow: SHADOW.sm
               }}
               title="Salta timer"
             >
