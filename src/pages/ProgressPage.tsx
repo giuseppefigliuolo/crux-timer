@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useWorkoutStore } from '../store/useWorkoutStore'
 import Card from '../components/ui/Card'
 import { formatSeconds } from '../utils/dateUtils'
+import { RADIUS, SHADOW } from '../styles/tokens'
 
 const feelings: Record<number, string> = {
   1: '😵',
@@ -93,7 +94,7 @@ export default function ProgressPage() {
 
 function StatBlock({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-surface rounded-xl border border-border p-4">
+    <div className="bg-surface border-[2.5px] border-[#3A1248] p-4" style={{ borderRadius: RADIUS.stat, boxShadow: SHADOW.sm }}>
       <p className={`text-xl font-bold font-timer ${color}`}>{value}</p>
       <p className="text-[11px] uppercase tracking-wider text-text-muted mt-1">{label}</p>
     </div>

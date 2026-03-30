@@ -6,6 +6,7 @@ import { useSettingsStore } from '../store/useSettingsStore'
 import { getProgram } from '../utils/getProgram'
 import { getMonthNameIT, getWeekNumber } from '../utils/dateUtils'
 import { getDayTypeColor } from '../utils/programUtils'
+import { RADIUS, SHADOW } from '../styles/tokens'
 
 const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']
 
@@ -62,7 +63,7 @@ export default function CalendarPage() {
         {getMonthNameIT(month)} {year}
       </p>
 
-      <div className="bg-surface rounded-2xl border border-border p-4">
+      <div className="bg-surface border-[3px] border-[#3A1248] p-4" style={{ borderRadius: RADIUS.card, boxShadow: SHADOW.lg }}>
         <div className="grid grid-cols-7 gap-1 mb-2">
           {WEEKDAY_LABELS.map((label) => (
             <div key={label} className="text-center text-[11px] font-semibold uppercase tracking-wider text-text-muted py-1">

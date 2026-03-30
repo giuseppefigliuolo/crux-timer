@@ -189,7 +189,8 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
+              className="bg-surface-elevated border-[3px] border-[#3A1248] p-5 w-full max-w-xs text-center"
+              style={{ borderRadius: RADIUS.card, boxShadow: SHADOW.lg }}
               onClick={(e) => e.stopPropagation()}
             >
               <p className="text-text font-semibold mb-1">Saltare esercizio?</p>
@@ -199,13 +200,15 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSkipConfirm(false)}
-                  className="flex-1 h-11 rounded-xl bg-surface border border-border text-sm font-medium text-text"
+                  className="flex-1 h-11 bg-surface border-[2.5px] border-[#3A1248] text-sm font-medium text-text active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                 >
                   Annulla
                 </button>
                 <button
                   onClick={onSkip}
-                  className="flex-1 h-11 rounded-xl bg-danger/15 text-sm font-medium text-danger"
+                  className="flex-1 h-11 bg-danger/15 border-[2.5px] border-[#3A1248] text-sm font-medium text-danger active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                 >
                   Salta
                 </button>
@@ -230,8 +233,9 @@ function ParamBox({ value, suffix, label, color, ringColor, active, onClick }: {
   return (
     <motion.button
       onClick={onClick}
-      className={`bg-surface rounded-xl p-3 text-center transition-all ${active ? `ring-2 ${ringColor} bg-surface-elevated` : 'hover:bg-surface-elevated'
+      className={`bg-surface border-[2px] border-[#3A1248] p-3 text-center transition-all ${active ? `ring-2 ${ringColor} bg-surface-elevated` : 'hover:bg-surface-elevated'
         }`}
+      style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.xs }}
       whileTap={{ scale: 0.95 }}
     >
       <p className={`text-lg font-bold font-timer ${color}`}>

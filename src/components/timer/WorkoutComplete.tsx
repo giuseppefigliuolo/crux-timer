@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Button from '../ui/Button'
 import { formatSeconds } from '../../utils/dateUtils'
 import { fireConfetti } from '../../utils/confetti'
+import { RADIUS, SHADOW } from '../../styles/tokens'
 
 interface WorkoutCompleteProps {
   dayTitle: string
@@ -50,7 +51,8 @@ export default function WorkoutComplete({
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-        className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mb-4"
+        className="w-20 h-20 bg-success/20 border-[3px] border-[#3A1248] flex items-center justify-center mb-4"
+        style={{ borderRadius: RADIUS.blob, boxShadow: SHADOW.md }}
       >
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5CB87A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
@@ -61,15 +63,24 @@ export default function WorkoutComplete({
       <p className="text-text-secondary text-sm mb-6">{dayTitle}</p>
 
       <div className="grid grid-cols-3 gap-3 w-full max-w-xs mb-6">
-        <div className="bg-surface rounded-xl p-3 text-center">
+        <div
+          className="bg-surface border-[2.5px] border-[#3A1248] p-3 text-center"
+          style={{ borderRadius: RADIUS.stat, boxShadow: SHADOW.sm }}
+        >
           <p className="text-lg font-bold font-timer text-primary">{exercisesCompleted}/{exercisesTotal}</p>
           <p className="text-[11px] uppercase tracking-wider text-text-muted">Esercizi</p>
         </div>
-        <div className="bg-surface rounded-xl p-3 text-center">
+        <div
+          className="bg-surface border-[2.5px] border-[#3A1248] p-3 text-center"
+          style={{ borderRadius: RADIUS.stat, boxShadow: SHADOW.sm }}
+        >
           <p className="text-lg font-bold font-timer text-secondary">{formatSeconds(duration)}</p>
           <p className="text-[11px] uppercase tracking-wider text-text-muted">Durata</p>
         </div>
-        <div className="bg-surface rounded-xl p-3 text-center">
+        <div
+          className="bg-surface border-[2.5px] border-[#3A1248] p-3 text-center"
+          style={{ borderRadius: RADIUS.stat, boxShadow: SHADOW.sm }}
+        >
           <p className="text-lg font-bold font-timer text-accent">{skippedExercises.length}</p>
           <p className="text-[11px] uppercase tracking-wider text-text-muted">Saltati</p>
         </div>
@@ -82,11 +93,12 @@ export default function WorkoutComplete({
             <button
               key={f.value}
               onClick={() => setFeeling(f.value)}
-              className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-1 p-2 transition-all ${
                 feeling === f.value
-                  ? 'bg-accent/20 scale-110'
-                  : 'bg-surface hover:bg-surface-elevated'
+                  ? 'bg-accent/20 scale-110 border-[2px] border-[#3A1248]'
+                  : 'bg-surface hover:bg-surface-elevated border-[2px] border-transparent'
               }`}
+              style={{ borderRadius: RADIUS.btnSm, boxShadow: feeling === f.value ? SHADOW.xs : 'none' }}
             >
               <span className="text-xl">{f.emoji}</span>
               <span className="text-[11px] text-text-muted">{f.label}</span>
@@ -100,7 +112,8 @@ export default function WorkoutComplete({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Note sull'allenamento... (opzionale)"
-          className="w-full bg-surface border border-border rounded-xl p-3 text-sm text-text placeholder-text-muted resize-none h-20 focus:outline-none focus:border-primary/50"
+          className="w-full bg-surface border-[2.5px] border-[#3A1248] p-3 text-sm text-text placeholder-text-muted resize-none h-20 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          style={{ borderRadius: RADIUS.card, boxShadow: SHADOW.sm }}
         />
       </div>
 

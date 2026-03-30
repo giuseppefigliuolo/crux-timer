@@ -327,8 +327,9 @@ function ParamBox({ value, suffix, label, color, ringColor, active, onClick }: {
   return (
     <motion.button
       onClick={onClick}
-      className={`bg-surface rounded-xl p-3 text-center transition-all ${active ? `ring-2 ${ringColor} bg-surface-elevated` : 'hover:bg-surface-elevated'
+      className={`bg-surface border-[2px] border-[#3A1248] p-3 text-center transition-all ${active ? `ring-2 ${ringColor} bg-surface-elevated` : 'hover:bg-surface-elevated'
         }`}
+      style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.xs }}
       whileTap={{ scale: 0.95 }}
     >
       <p className={`text-lg font-bold font-timer ${color}`}>
@@ -555,7 +556,8 @@ function PresetButton({ label, sub, onClick }: { label: string; sub: string; onC
     <motion.button
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="bg-surface-elevated rounded-xl p-3 text-center border border-border hover:ring-2 ring-primary/20 transition-all"
+      className="bg-surface-elevated border-[2.5px] border-[#3A1248] p-3 text-center hover:ring-2 ring-primary/20 transition-all"
+      style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
     >
       <p className="text-sm font-semibold text-text">{label}</p>
       <p className="text-[11px] text-text-muted">{sub}</p>

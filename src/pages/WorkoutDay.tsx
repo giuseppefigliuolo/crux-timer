@@ -523,7 +523,7 @@ function ExerciseDetailModal({
             </div>
 
             {exercise.notes && (
-              <div className="rounded-xl bg-accent-soft border border-accent/30 px-4 py-3 mb-5">
+              <div className="bg-accent-soft border-[2px] border-[#3A1248] px-4 py-3 mb-5" style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.xs }}>
                 <p className="text-xs text-text font-semibold uppercase tracking-wider mb-1">
                   Note
                 </p>
@@ -551,7 +551,7 @@ function DetailCell({
   color: string
 }) {
   return (
-    <div className="bg-surface-elevated rounded-xl p-3 text-center">
+    <div className="bg-surface-elevated border-[2px] border-[#3A1248] p-3 text-center" style={{ borderRadius: RADIUS.stat, boxShadow: SHADOW.xs }}>
       <p className={`text-lg font-bold font-timer ${color}`}>{value}</p>
       <p className="text-[11px] uppercase tracking-wider text-text-muted">
         {label}

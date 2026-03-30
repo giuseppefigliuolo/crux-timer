@@ -451,7 +451,10 @@ export default function WorkoutRunner({
                   backgroundColor: '#E8622A30'
                 }}
               />
-              <div className="w-52 h-52 rounded-full border-[6px] border-primary/20 flex flex-col items-center justify-center">
+              <div
+                className="w-52 h-52 border-[4px] border-[#3A1248] bg-surface-elevated flex flex-col items-center justify-center"
+                style={{ borderRadius: RADIUS.blob, boxShadow: SHADOW.md }}
+              >
                 <p className="font-timer text-7xl text-primary leading-none">
                   {exercise?.repsPerSet ?? 0}
                 </p>
@@ -466,7 +469,10 @@ export default function WorkoutRunner({
             </p>
 
             {exercise?.weight && exercise.weight !== 'corpo libero' && (
-              <span className="text-xs px-3 py-1 rounded-full bg-violet-soft text-violet font-semibold mt-4">
+              <span
+                className="text-xs px-3 py-1 bg-violet-soft text-violet font-semibold mt-4 border-[1.5px] border-[#3A1248]"
+                style={{ borderRadius: RADIUS.pill, boxShadow: SHADOW.xxs }}
+              >
                 {exercise.weight}
               </span>
             )}
@@ -474,7 +480,8 @@ export default function WorkoutRunner({
             <motion.button
               whileTap={{ scale: 0.93 }}
               onClick={handleRepsSetDone}
-              className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 mt-8"
+              className="w-20 h-20 bg-primary border-[3px] border-[#3A1248] flex items-center justify-center mt-8 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+              style={{ borderRadius: RADIUS.controlLg, boxShadow: SHADOW.md }}
             >
               <svg
                 width="32"
@@ -492,7 +499,8 @@ export default function WorkoutRunner({
 
             <button
               onClick={() => setShowSkipConfirm(true)}
-              className="mt-6 w-10 h-10 rounded-full bg-surface-elevated border border-border flex items-center justify-center"
+              className="mt-6 w-14 h-14 bg-surface border-[2.5px] border-[#3A1248] flex items-center justify-center active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+              style={{ borderRadius: RADIUS.controlSm, boxShadow: SHADOW.sm }}
               title="Salta esercizio"
             >
               <svg
@@ -526,7 +534,8 @@ export default function WorkoutRunner({
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
+                className="bg-surface-elevated border-[3px] border-[#3A1248] p-5 w-full max-w-xs text-center"
+                style={{ borderRadius: RADIUS.card, boxShadow: SHADOW.lg }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <p className="text-text font-semibold mb-1">
@@ -538,13 +547,15 @@ export default function WorkoutRunner({
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowSkipConfirm(false)}
-                    className="flex-1 h-11 rounded-xl bg-surface border border-border text-sm font-medium text-text"
+                    className="flex-1 h-11 bg-surface border-[2.5px] border-[#3A1248] text-sm font-medium text-text active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                    style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                   >
                     Annulla
                   </button>
                   <button
                     onClick={handleSkipExerciseConfirm}
-                    className="flex-1 h-11 rounded-xl bg-danger/15 text-sm font-medium text-danger"
+                    className="flex-1 h-11 bg-danger/15 border-[2.5px] border-[#3A1248] text-sm font-medium text-danger active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                    style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                   >
                     Salta
                   </button>
@@ -706,7 +717,8 @@ export default function WorkoutRunner({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="bg-surface-elevated border border-border rounded-2xl p-5 w-full max-w-xs text-center"
+              className="bg-surface-elevated border-[3px] border-[#3A1248] p-5 w-full max-w-xs text-center"
+              style={{ borderRadius: RADIUS.card, boxShadow: SHADOW.lg }}
               onClick={(e) => e.stopPropagation()}
             >
               <p className="text-text font-semibold mb-1">Saltare esercizio?</p>
@@ -716,13 +728,15 @@ export default function WorkoutRunner({
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSkipConfirm(false)}
-                  className="flex-1 h-11 rounded-xl bg-surface border border-border text-sm font-medium text-text"
+                  className="flex-1 h-11 bg-surface border-[2.5px] border-[#3A1248] text-sm font-medium text-text active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                 >
                   Annulla
                 </button>
                 <button
                   onClick={handleSkipExerciseConfirm}
-                  className="flex-1 h-11 rounded-xl bg-danger/15 text-sm font-medium text-danger"
+                  className="flex-1 h-11 bg-danger/15 border-[2.5px] border-[#3A1248] text-sm font-medium text-danger active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  style={{ borderRadius: RADIUS.btnSm, boxShadow: SHADOW.sm }}
                 >
                   Salta
                 </button>
