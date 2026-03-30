@@ -9,6 +9,7 @@ import {
 } from 'framer-motion'
 import PageHeader from '../components/ui/PageHeader'
 import Card from '../components/ui/Card'
+import ExerciseDescription from '../components/ui/ExerciseDescription'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import ExerciseIllustration from '../components/illustrations/ExerciseIllustration'
@@ -95,7 +96,7 @@ export default function WorkoutDay() {
           variants={fadeUp}
           className="text-sm text-text-secondary mb-4"
         >
-          {day.description}
+          <ExerciseDescription text={day.description} />
         </motion.p>
 
         <motion.div
@@ -254,7 +255,7 @@ function ExerciseCard({
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-text">{exercise.name}</h3>
           <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">
-            {exercise.description}
+            <ExerciseDescription text={exercise.description} linkStopPropagation />
           </p>
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -472,7 +473,7 @@ function ExerciseDetailModal({
             </div>
 
             <p className="text-sm text-text-secondary leading-relaxed mb-5">
-              {exercise.description}
+              <ExerciseDescription text={exercise.description} />
             </p>
 
             <div className="flex flex-wrap gap-2 mb-5">

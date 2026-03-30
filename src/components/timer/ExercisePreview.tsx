@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform, animate as motionAnimate, type PanInfo } from 'framer-motion'
 import type { Exercise } from '../../types'
 import Button from '../ui/Button'
+import ExerciseDescription from '../ui/ExerciseDescription'
 import Badge from '../ui/Badge'
 import ExerciseIllustration from '../illustrations/ExerciseIllustration'
 import { SURFACE, SURFACE_ELEVATED, RADIUS, SHADOW } from '../../styles/tokens'
@@ -101,7 +102,9 @@ export default function ExercisePreview({ exercise, exerciseIndex, totalExercise
         </div>
 
         <h2 className="text-xl font-bold text-text mb-2">{exercise.name}</h2>
-        <p className="text-sm text-text-secondary mb-4 max-w-xs">{exercise.description}</p>
+        <p className="text-sm text-text-secondary mb-4 max-w-xs">
+          <ExerciseDescription text={exercise.description} />
+        </p>
 
         <div className="flex flex-wrap justify-center gap-2 mb-4">
           <span className="text-xs px-3 py-1 rounded-full bg-surface-elevated text-text-muted">
