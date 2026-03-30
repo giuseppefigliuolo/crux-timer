@@ -51,20 +51,28 @@ export default function ExerciseDescription({
     ? (e: MouseEvent<HTMLAnchorElement>) => e.stopPropagation()
     : undefined
 
+  const refRowClass = body
+    ? 'mt-2 block border-t border-border/40 pt-2 text-[0.92em] leading-snug'
+    : 'block text-[0.92em] leading-snug'
+
   return (
     <span className={className}>
-      {body}
-      {body ? ' ' : null}
-      Ref:{' '}
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onLinkClick}
-        className="text-primary font-medium underline underline-offset-2 decoration-primary/50 hover:decoration-primary break-all"
-      >
-        {refUrl}
-      </a>
+      {body ? <span className="block">{body}</span> : null}
+      <span className={refRowClass}>
+        <span aria-hidden className="mr-1.5 select-none">
+          🔗
+        </span>
+        Ref:{' '}
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onLinkClick}
+          className="text-primary font-medium underline underline-offset-2 decoration-primary/50 hover:decoration-primary break-all"
+        >
+          {refUrl}
+        </a>
+      </span>
     </span>
   )
 }

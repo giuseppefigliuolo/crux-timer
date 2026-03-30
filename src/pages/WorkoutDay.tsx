@@ -254,7 +254,7 @@ function ExerciseCard({
         <ExerciseFlowerNumber index={index} />
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-text">{exercise.name}</h3>
-          <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">
+          <p className="text-xs text-text-secondary mt-0.5 line-clamp-5">
             <ExerciseDescription text={exercise.description} linkStopPropagation />
           </p>
 
