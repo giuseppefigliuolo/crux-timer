@@ -13,5 +13,5 @@ export function getProgram(id: ProgramId): TrainingProgram {
 
 export const programOptions: { id: ProgramId; label: string; description: string }[] = [
   { id: 'home', label: 'Piano 4 Settimane', description: 'Programma completo con tutta l\'attrezzatura' },
-  { id: 'travel', label: 'Trasferta 2 Settimane', description: 'Metolius Simulator 3D + manubrio 8kg' },
+  { id: 'travel', label: 'Trasferta 2 Settimane', description: 'Two Stones hangboard + manubrio 8kg' },
 ]
